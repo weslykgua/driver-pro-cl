@@ -42,7 +42,9 @@ export default function LoginScreen() {
         });
         if (error) throw error;
 
-        if (data?.user) {
+        if (data?.session) {
+          router.replace('/(tabs)');
+        } else if (data?.user) {
           Alert.alert(
             'Cuenta Creada Exitosamente',
             'Tu cuenta ha sido creada. Puedes iniciar sesión ahora.',
@@ -89,10 +91,6 @@ export default function LoginScreen() {
     }
   };
 
-  const handleDemoMode = () => {
-    router.replace('/(tabs)');
-  };
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -106,18 +104,35 @@ export default function LoginScreen() {
               <Ionicons name="shield-checkmark" size={28} color={COLORS.primary} />
             </View>
             <Text style={styles.appName}>Conductor Pro</Text>
-            <Text style={styles.appTagline}>Gestión Financiera & Control Operativo por Cuenta</Text>
+            <Text style={styles.appTagline}>Gestión Financiera para Conductores</Text>
           </View>
 
           {/* Subtitle */}
           <Text style={styles.formTitle}>
-            {isSignUp ? 'Registro de Cuenta Individual' : 'Acceso Institucional por Usuario'}
+            {isSignUp ? 'Crear Cuenta de Usuario' : 'Acceso por Cuenta'}
           </Text>
           <Text style={styles.formSubtitle}>
-            Sus datos financieros se almacenan de forma privada e aislada por cuenta
+            Es necesario contar con una cuenta activa para guardar y consultar sus registros
           </Text>
 
-          {/* Form Inputs */}
+          {/* Google OAuth Button (Primary Option) */}
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={handleGoogleAuth}
+            disabled={loading}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="logo-google" size={18} color={COLORS.text} style={{ marginRight: 8 }} />
+            <Text style={styles.googleButtonText}>Continuar con Google</Text>
+          </TouchableOpacity>
+
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>O INGRESA CON EMAIL</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Email / Password Form */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Correo Electrónico</Text>
             <View style={styles.inputWrapper}>
@@ -149,7 +164,7 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          {/* Primary Button */}
+          {/* Primary Action Button */}
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={handleEmailAuth}
@@ -160,39 +175,16 @@ export default function LoginScreen() {
               <ActivityIndicator color="#FFFFFF" />
             ) : (
               <Text style={styles.primaryButtonText}>
-                {isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}
+                {isSignUp ? 'Registrar Cuenta' : 'Iniciar Sesión'}
               </Text>
             )}
           </TouchableOpacity>
 
-          {/* Google OAuth Button */}
-          <TouchableOpacity
-            style={styles.googleButton}
-            onPress={handleGoogleAuth}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            <Ionicons name="logo-google" size={18} color={COLORS.text} style={{ marginRight: 8 }} />
-            <Text style={styles.googleButtonText}>Acceder con Google</Text>
-          </TouchableOpacity>
-
-          {/* Toggle Login / SignUp */}
+          {/* Toggle Sign In / Register */}
           <TouchableOpacity style={styles.toggleButton} onPress={() => setIsSignUp(!isSignUp)}>
             <Text style={styles.toggleText}>
-              {isSignUp ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Registrate aquí'}
+              {isSignUp ? '¿Ya tienes cuenta? Inicia sesión aquí' : '¿No tienes cuenta? Registra tu correo'}
             </Text>
-          </TouchableOpacity>
-
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>MODO EVALUACIÓN</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Quick Demo Mode */}
-          <TouchableOpacity style={styles.demoButton} onPress={handleDemoMode} activeOpacity={0.8}>
-            <Ionicons name="cube-outline" size={16} color={COLORS.secondary} style={{ marginRight: 6 }} />
-            <Text style={styles.demoButtonText}>Acceso Directo (Modo Demo)</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -266,6 +258,38 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 20,
   },
+  googleButton: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.surface,
+    height: 46,
+    borderRadius: RADIUS.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.borderDark,
+  },
+  googleButtonText: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: COLORS.border,
+  },
+  dividerText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: COLORS.textMuted,
+    paddingHorizontal: 10,
+    letterSpacing: 0.5,
+  },
   inputContainer: {
     marginBottom: 14,
   },
@@ -301,26 +325,10 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 6,
   },
   primaryButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  googleButton: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.surface,
-    height: 44,
-    borderRadius: RADIUS.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: COLORS.borderDark,
-  },
-  googleButtonText: {
-    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -330,38 +338,6 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     color: COLORS.primary,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.border,
-  },
-  dividerText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    paddingHorizontal: 10,
-    letterSpacing: 0.5,
-  },
-  demoButton: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.neutralSoft,
-    height: 42,
-    borderRadius: RADIUS.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  demoButtonText: {
-    color: COLORS.secondary,
     fontSize: 13,
     fontWeight: '600',
   },

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
@@ -52,7 +52,6 @@ export default function RootLayout() {
           monthly_pocket_target: 1300000,
           default_consumption: 7.4,
         };
-        // Auto upsert profile for new user
         await supabase.from('profiles').upsert(defaultProf);
         setProfile(defaultProf);
       }
@@ -68,6 +67,7 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
+    // Initial JWT session fetch
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
       setSession(session);
       if (session?.user) {
@@ -76,6 +76,7 @@ export default function RootLayout() {
       setLoading(false);
     });
 
+    // JWT session change listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event: string, session: Session | null) => {
         setSession(session);
@@ -94,9 +95,17 @@ export default function RootLayout() {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setProfile(null);
+    setLoading(true);
+    try {
+      // Revoke JWT token session in Supabase & clear storage
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('SignOut exception:', e);
+    } finally {
+      setSession(null);
+      setProfile(null);
+      setLoading(false);
+    }
   };
 
   return (
@@ -139,8 +148,7 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
-        
-        {/* GDPR Essential Cookie Consent Banner */}
+
         <CookieConsentBanner />
       </View>
     </AuthContext.Provider>

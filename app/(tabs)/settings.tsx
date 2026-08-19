@@ -66,7 +66,7 @@ export default function SettingsScreen() {
   };
 
   const handleSignOut = async () => {
-    Alert.alert('Cerrar Sesión', '¿Desea finalizar la sesión activa?', [
+    Alert.alert('Cerrar Sesión', '¿Desea cerrar su sesión y revocar el token activo?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Cerrar Sesión',
@@ -90,14 +90,14 @@ export default function SettingsScreen() {
           <Ionicons name="person-outline" size={18} color={COLORS.primary} />
         </View>
         <View style={styles.profileInfo}>
-          <Text style={styles.userEmail}>{user?.email || 'Usuario Demo (Modo Evaluación)'}</Text>
-          <Text style={styles.userStatus}>Cuenta de Usuario Activa</Text>
+          <Text style={styles.userEmail}>{user?.email || 'Cuenta no autenticada'}</Text>
+          <Text style={styles.userStatus}>Sesión JWT Activa & Cifrada</Text>
         </View>
       </View>
 
       {/* Settings Form */}
       <View style={styles.formCard}>
-        <Text style={styles.sectionHeader}>Configuración Operativa</Text>
+        <Text style={styles.sectionHeader}>Configuración Operativa de la Cuenta</Text>
 
         {/* Monthly Target */}
         <View style={styles.inputGroup}>
@@ -180,7 +180,7 @@ export default function SettingsScreen() {
           {saving ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={styles.saveButtonText}>Guardar Configuración</Text>
+            <Text style={styles.saveButtonText}>Guardar Configuración de Cuenta</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -188,7 +188,7 @@ export default function SettingsScreen() {
       {/* Sign Out */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.8}>
         <Ionicons name="log-out-outline" size={16} color={COLORS.danger} style={{ marginRight: 6 }} />
-        <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+        <Text style={styles.logoutButtonText}>Cerrar Sesión & Revocar Token JWT</Text>
       </TouchableOpacity>
     </ScrollView>
   );
