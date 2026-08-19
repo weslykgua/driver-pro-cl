@@ -6,6 +6,9 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +20,12 @@ import { ProgressBar } from '../../components/ProgressBar';
 import { formatCLP } from '../../utils/calculations';
 import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
 
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+export type TimeRangeFilter = 'month' | 'week' | 'today' | 'all';
+
 export default function DashboardScreen() {
   const router = useRouter();
   const { user, profile } = useAuth();
@@ -25,6 +34,7 @@ export default function DashboardScreen() {
   const [shifts, setShifts] = useState<DailyShift[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<TimeRangeFilter>('month');
 
   const fetchShifts = useCallback(async () => {
     try {
@@ -34,16 +44,10 @@ export default function DashboardScreen() {
         return;
       }
 
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-        .toISOString()
-        .split('T')[0];
-
       const { data, error } = await supabase
         .from('daily_shifts')
         .select('*')
         .eq('user_id', user.id)
-        .gte('shift_date', startOfMonth)
         .order('shift_date', { ascending: false });
 
       if (error) throw error;
@@ -70,22 +74,75 @@ export default function DashboardScreen() {
     fetchShifts();
   };
 
-  const activeShifts = shifts.filter((s) => !s.is_deleted);
+  const handleRangeChange = (range: TimeRangeFilter) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setTimeRange(range);
+  };
+
+  // Filter shifts based on selected time range
+  const getFilteredShifts = (): DailyShift[] => {
+    const active = shifts.filter((s) => !s.is_deleted);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentDate = now.getDate();
+
+    if (timeRange === 'today') {
+      const todayStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
+      return active.filter((s) => s.shift_date === todayStr);
+    }
+
+    if (timeRange === 'week') {
+      const dayOfWeek = now.getDay();
+      const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const monday = new Date(currentYear, currentMonth, currentDate + diffToMonday);
+      const mondayStr = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+      return active.filter((s) => s.shift_date >= mondayStr);
+    }
+
+    if (timeRange === 'month') {
+      const startOfMonthStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`;
+      return active.filter((s) => s.shift_date >= startOfMonthStr);
+    }
+
+    return active;
+  };
+
+  const filteredShifts = getFilteredShifts();
 
   const monthlyTarget = profile?.monthly_pocket_target || 1300000;
-  const totalPocketNet = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.pocket_net), 0);
-  const totalFuelCost = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.fuel_cost), 0);
-  const totalSiiTax = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.sii_tax_amount), 0);
-  const totalAppBalance = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.app_balance), 0);
-  const totalHours = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.hours), 0);
-  const totalKm = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.distance_km), 0);
+
+  // Calculate Target & Label based on Time Range
+  const getTargetConfig = () => {
+    switch (timeRange) {
+      case 'today':
+        return { target: Math.round(monthlyTarget / 20), label: 'Meta Diaria Líquida', periodName: 'el día de hoy' };
+      case 'week':
+        return { target: Math.round(monthlyTarget / 4), label: 'Meta Semanal Líquida', periodName: 'esta semana' };
+      case 'all':
+        return { target: monthlyTarget * 12, label: 'Meta Anual Acumulada', periodName: 'el historial' };
+      case 'month':
+      default:
+        return { target: monthlyTarget, label: 'Meta Mensual Líquida', periodName: 'este mes' };
+    }
+  };
+
+  const targetConfig = getTargetConfig();
+  const currentTarget = targetConfig.target;
+
+  const totalPocketNet = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.pocket_net), 0);
+  const totalFuelCost = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.fuel_cost), 0);
+  const totalSiiTax = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.sii_tax_amount), 0);
+  const totalAppBalance = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.app_balance), 0);
+  const totalHours = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.hours), 0);
+  const totalKm = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.distance_km), 0);
 
   const avgNetPerHour = totalHours > 0 ? Math.round(totalPocketNet / totalHours) : 0;
   const avgNetPerKm = totalKm > 0 ? Math.round(totalPocketNet / totalKm) : 0;
 
-  const remainingPocket = Math.max(0, monthlyTarget - totalPocketNet);
+  const remainingPocket = Math.max(0, currentTarget - totalPocketNet);
   const hoursNeeded = avgNetPerHour > 0 ? Math.ceil(remainingPocket / avgNetPerHour) : 0;
-  const avgHoursPerDay = activeShifts.length > 0 ? totalHours / activeShifts.length : 7.5;
+  const avgHoursPerDay = filteredShifts.length > 0 ? totalHours / filteredShifts.length : 7.5;
   const daysNeeded = avgHoursPerDay > 0 ? Math.ceil(hoursNeeded / avgHoursPerDay) : 0;
 
   return (
@@ -118,16 +175,71 @@ export default function DashboardScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Time Range Selector Bar */}
+      <View style={[styles.timeSelectorBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <TouchableOpacity
+          style={[
+            styles.timeOptionButton,
+            timeRange === 'month' && [styles.timeOptionActive, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]
+          ]}
+          onPress={() => handleRangeChange('month')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.timeOptionText, { color: timeRange === 'month' ? colors.primary : colors.textMuted }]}>
+            Este Mes
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.timeOptionButton,
+            timeRange === 'week' && [styles.timeOptionActive, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]
+          ]}
+          onPress={() => handleRangeChange('week')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.timeOptionText, { color: timeRange === 'week' ? colors.primary : colors.textMuted }]}>
+            Esta Semana
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.timeOptionButton,
+            timeRange === 'today' && [styles.timeOptionActive, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]
+          ]}
+          onPress={() => handleRangeChange('today')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.timeOptionText, { color: timeRange === 'today' ? colors.primary : colors.textMuted }]}>
+            Hoy
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.timeOptionButton,
+            timeRange === 'all' && [styles.timeOptionActive, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]
+          ]}
+          onPress={() => handleRangeChange('all')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.timeOptionText, { color: timeRange === 'all' ? colors.primary : colors.textMuted }]}>
+            Todo
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Target Progress Bar */}
-      <ProgressBar current={totalPocketNet} target={monthlyTarget} label="Meta Mensual Líquida" />
+      <ProgressBar current={totalPocketNet} target={currentTarget} label={targetConfig.label} />
 
       {/* Empty State Banner if no shifts */}
-      {activeShifts.length === 0 ? (
+      {filteredShifts.length === 0 ? (
         <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Ionicons name="document-text-outline" size={24} color={colors.textMuted} style={{ marginBottom: 8 }} />
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>Sin turnos registrados este mes</Text>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>Sin turnos registrados en {targetConfig.periodName}</Text>
           <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
-            Presione el botón "Registrar Turno" para ingresar su primera jornada del mes.
+            Presione el botón "Registrar Turno" para ingresar su primera jornada de este período.
           </Text>
         </View>
       ) : (
@@ -141,25 +253,27 @@ export default function DashboardScreen() {
           {remainingPocket > 0 ? (
             <Text style={[styles.paceBodyText, { color: colors.textSecondary }]}>
               A una tasa promedio de <Text style={[styles.paceHighlight, { color: colors.text }]}>{formatCLP(avgNetPerHour)}/h</Text>, se requieren aproximadamente{' '}
-              <Text style={[styles.paceHighlight, { color: colors.text }]}>{hoursNeeded} horas</Text> (~{daysNeeded} jornadas) para alcanzar el objetivo mensual.
+              <Text style={[styles.paceHighlight, { color: colors.text }]}>{hoursNeeded} horas</Text> (~{daysNeeded} jornadas) para alcanzar el objetivo de {targetConfig.periodName}.
             </Text>
           ) : (
             <Text style={[styles.paceBodyTextSuccess, { color: colors.success }]}>
-              Meta de {formatCLP(monthlyTarget)} alcanzada. Los ingresos adicionales constituyen excedente neto.
+              Meta de {formatCLP(currentTarget)} alcanzada. Los ingresos adicionales constituyen excedente neto.
             </Text>
           )}
         </View>
       )}
 
       {/* Main KPI Cards Grid */}
-      <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Métricas Financieras del Período</Text>
+      <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+        Métricas Financieras — {timeRange === 'month' ? 'Este Mes' : timeRange === 'week' ? 'Esta Semana' : timeRange === 'today' ? 'Hoy' : 'Histórico Completo'}
+      </Text>
 
       <View style={styles.gridContainer}>
         {/* Total Pocket Net */}
         <MetricCard
           title="Bolsillo Libre Acumulado"
           value={formatCLP(totalPocketNet)}
-          subtitle={`${activeShifts.length} turnos registrados`}
+          subtitle={`${filteredShifts.length} turnos registrados`}
           iconName="wallet-outline"
           variant="emerald"
           style={styles.fullWidthCard}
@@ -230,7 +344,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
     marginTop: 8,
   },
   brandTitle: {
@@ -253,6 +367,27 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     fontWeight: '700',
     fontSize: 13,
+  },
+  timeSelectorBar: {
+    flexDirection: 'row',
+    borderRadius: RADIUS.sm,
+    padding: 3,
+    marginBottom: 14,
+    borderWidth: 1,
+  },
+  timeOptionButton: {
+    flex: 1,
+    paddingVertical: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: RADIUS.sm - 2,
+  },
+  timeOptionActive: {
+    borderWidth: 1,
+  },
+  timeOptionText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   emptyCard: {
     borderRadius: RADIUS.md,
