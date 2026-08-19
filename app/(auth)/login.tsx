@@ -25,13 +25,40 @@ export default function LoginScreen() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
+  // Password security validation standards
+  const hasMinLength = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const isPasswordMatch = password.length > 0 && password === confirmPassword;
+
+  const isPasswordValid = hasMinLength && hasUpper && hasNumber;
+
   const handleEmailAuth = async () => {
     if (!email || !password) {
-      Alert.alert('Atención', 'Por favor ingresa tu email y contraseña');
+      const msg = 'Por favor ingresa tu email y contraseña.';
+      if (Platform.OS === 'web') window.alert(msg);
+      else Alert.alert('Atención', msg);
       return;
+    }
+
+    if (isSignUp) {
+      if (!isPasswordValid) {
+        const msg = 'La contraseña no cumple con los estándares mínimos de seguridad (8+ caracteres, 1 mayúscula y 1 número).';
+        if (Platform.OS === 'web') window.alert(msg);
+        else Alert.alert('Estándares de Contraseña', msg);
+        return;
+      }
+
+      if (!isPasswordMatch) {
+        const msg = 'Las contraseñas ingresadas no coinciden. Por favor verifique ambas entradas.';
+        if (Platform.OS === 'web') window.alert(msg);
+        else Alert.alert('Verificación de Contraseña', msg);
+        return;
+      }
     }
 
     setLoading(true);
@@ -46,11 +73,10 @@ export default function LoginScreen() {
         if (data?.session) {
           router.replace('/(tabs)');
         } else if (data?.user) {
-          Alert.alert(
-            'Cuenta Creada Exitosamente',
-            'Tu cuenta ha sido creada. Puedes iniciar sesión ahora.',
-            [{ text: 'Aceptar', onPress: () => setIsSignUp(false) }]
-          );
+          const successMsg = 'Tu cuenta ha sido creada exitosamente. Puedes iniciar sesión ahora.';
+          if (Platform.OS === 'web') window.alert(successMsg);
+          else Alert.alert('Cuenta Creada', successMsg);
+          setIsSignUp(false);
         }
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -64,7 +90,9 @@ export default function LoginScreen() {
         }
       }
     } catch (error: any) {
-      Alert.alert('Error de Autenticación', error.message || 'No se pudo completar la operación.');
+      const errMsg = error.message || 'No se pudo completar la operación.';
+      if (Platform.OS === 'web') window.alert(errMsg);
+      else Alert.alert('Error de Autenticación', errMsg);
     } finally {
       setLoading(false);
     }
@@ -86,7 +114,9 @@ export default function LoginScreen() {
       });
       if (error) throw error;
     } catch (error: any) {
-      Alert.alert('Google OAuth', error.message || 'No se pudo iniciar sesión con Google.');
+      const msg = error.message || 'No se pudo iniciar sesión con Google.';
+      if (Platform.OS === 'web') window.alert(msg);
+      else Alert.alert('Google OAuth', msg);
     } finally {
       setLoading(false);
     }
@@ -117,7 +147,9 @@ export default function LoginScreen() {
             {isSignUp ? 'Crear Cuenta de Usuario' : 'Acceso por Cuenta'}
           </Text>
           <Text style={[styles.formSubtitle, { color: colors.textMuted }]}>
-            Es necesario contar con una cuenta activa para guardar y consultar sus registros
+            {isSignUp
+              ? 'Complete los datos requeridos para registrar su cuenta individual de forma segura'
+              : 'Es necesario contar con una cuenta activa para guardar y consultar sus registros'}
           </Text>
 
           {/* Google OAuth Button */}
@@ -137,7 +169,7 @@ export default function LoginScreen() {
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
           </View>
 
-          {/* Email / Password Form */}
+          {/* Email Input */}
           <View style={styles.inputContainer}>
             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Correo Electrónico</Text>
             <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
@@ -154,6 +186,7 @@ export default function LoginScreen() {
             </View>
           </View>
 
+          {/* Password Input */}
           <View style={styles.inputContainer}>
             <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Contraseña</Text>
             <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
@@ -168,6 +201,82 @@ export default function LoginScreen() {
               />
             </View>
           </View>
+
+          {/* Registration Mode: Confirm Password & Password Standards Checklist */}
+          {isSignUp && (
+            <>
+              {/* Confirm Password Field */}
+              <View style={styles.inputContainer}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Confirmar Contraseña</Text>
+                <View style={[
+                  styles.inputWrapper,
+                  { backgroundColor: colors.surface, borderColor: confirmPassword.length > 0 ? (isPasswordMatch ? colors.success : colors.danger) : colors.borderDark }
+                ]}>
+                  <Ionicons name="shield-checkmark-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
+                  <TextInput
+                    style={[styles.textInput, { color: colors.text }]}
+                    placeholder="••••••••"
+                    placeholderTextColor={colors.textMuted}
+                    secureTextEntry
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                  />
+                  {confirmPassword.length > 0 && (
+                    <Ionicons
+                      name={isPasswordMatch ? 'checkmark-circle' : 'close-circle'}
+                      size={18}
+                      color={isPasswordMatch ? colors.success : colors.danger}
+                    />
+                  )}
+                </View>
+                {confirmPassword.length > 0 && !isPasswordMatch && (
+                  <Text style={[styles.matchErrorText, { color: colors.danger }]}>
+                    Las contraseñas no coinciden
+                  </Text>
+                )}
+              </View>
+
+              {/* Password Standards Checklist */}
+              <View style={[styles.checklistCard, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
+                <Text style={[styles.checklistTitle, { color: colors.textSecondary }]}>
+                  Estándares de Seguridad de la Contraseña:
+                </Text>
+                
+                <View style={styles.checkItem}>
+                  <Ionicons
+                    name={hasMinLength ? 'checkmark-circle' : 'ellipse-outline'}
+                    size={14}
+                    color={hasMinLength ? colors.success : colors.textMuted}
+                  />
+                  <Text style={[styles.checkText, { color: hasMinLength ? colors.text : colors.textMuted }]}>
+                    Mínimo 8 caracteres
+                  </Text>
+                </View>
+
+                <View style={styles.checkItem}>
+                  <Ionicons
+                    name={hasUpper ? 'checkmark-circle' : 'ellipse-outline'}
+                    size={14}
+                    color={hasUpper ? colors.success : colors.textMuted}
+                  />
+                  <Text style={[styles.checkText, { color: hasUpper ? colors.text : colors.textMuted }]}>
+                    Al menos una letra mayúscula (A-Z)
+                  </Text>
+                </View>
+
+                <View style={styles.checkItem}>
+                  <Ionicons
+                    name={hasNumber ? 'checkmark-circle' : 'ellipse-outline'}
+                    size={14}
+                    color={hasNumber ? colors.success : colors.textMuted}
+                  />
+                  <Text style={[styles.checkText, { color: hasNumber ? colors.text : colors.textMuted }]}>
+                    Al menos un número (0-9)
+                  </Text>
+                </View>
+              </View>
+            </>
+          )}
 
           {/* Primary Action Button */}
           <TouchableOpacity
@@ -186,7 +295,13 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           {/* Toggle Sign In / Register */}
-          <TouchableOpacity style={styles.toggleButton} onPress={() => setIsSignUp(!isSignUp)}>
+          <TouchableOpacity
+            style={styles.toggleButton}
+            onPress={() => {
+              setIsSignUp(!isSignUp);
+              setConfirmPassword('');
+            }}
+          >
             <Text style={[styles.toggleText, { color: colors.primary }]}>
               {isSignUp ? '¿Ya tienes cuenta? Inicia sesión aquí' : '¿No tienes cuenta? Registra tu correo'}
             </Text>
@@ -305,6 +420,33 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     fontSize: 14,
+  },
+  matchErrorText: {
+    fontSize: 11,
+    marginTop: 4,
+    fontWeight: '500',
+  },
+  checklistCard: {
+    borderRadius: RADIUS.sm,
+    padding: 12,
+    borderWidth: 1,
+    marginBottom: 16,
+    gap: 6,
+  },
+  checklistTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+    marginBottom: 2,
+  },
+  checkItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  checkText: {
+    fontSize: 12,
   },
   primaryButton: {
     height: 44,
