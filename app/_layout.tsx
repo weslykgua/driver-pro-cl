@@ -6,6 +6,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
 import { COLORS } from '../constants/theme';
+import { CookieConsentBanner } from '../components/CookieConsentBanner';
 
 interface AuthContextType {
   session: Session | null;
@@ -51,6 +52,8 @@ export default function RootLayout() {
           monthly_pocket_target: 1300000,
           default_consumption: 7.4,
         };
+        // Auto upsert profile for new user
+        await supabase.from('profiles').upsert(defaultProf);
         setProfile(defaultProf);
       }
     } catch (e) {
@@ -92,6 +95,8 @@ export default function RootLayout() {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setSession(null);
+    setProfile(null);
   };
 
   return (
@@ -134,6 +139,9 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
+        
+        {/* GDPR Essential Cookie Consent Banner */}
+        <CookieConsentBanner />
       </View>
     </AuthContext.Provider>
   );

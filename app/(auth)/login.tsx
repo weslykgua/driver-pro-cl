@@ -36,22 +36,32 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
+        const { data, error } = await supabase.auth.signUp({
+          email: email.trim(),
           password,
         });
         if (error) throw error;
-        Alert.alert('Registro exitoso', 'Revisa tu correo o inicia sesión.');
+
+        if (data?.user) {
+          Alert.alert(
+            'Cuenta Creada Exitosamente',
+            'Tu cuenta ha sido creada. Puedes iniciar sesión ahora.',
+            [{ text: 'Aceptar', onPress: () => setIsSignUp(false) }]
+          );
+        }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
           password,
         });
         if (error) throw error;
-        router.replace('/(tabs)');
+
+        if (data?.session) {
+          router.replace('/(tabs)');
+        }
       }
     } catch (error: any) {
-      Alert.alert('Error de autenticación', error.message || 'Ocurrió un error al ingresar');
+      Alert.alert('Error de Autenticación', error.message || 'No se pudo completar la operación.');
     } finally {
       setLoading(false);
     }
@@ -60,15 +70,20 @@ export default function LoginScreen() {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
+      const redirectUrl = Platform.OS === 'web' ? window.location.origin : 'conductor-pro://';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: Platform.OS === 'web' ? window.location.origin : 'conductor-pro://',
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       if (error) throw error;
     } catch (error: any) {
-      Alert.alert('OAuth Error', error.message || 'No se pudo iniciar con Google');
+      Alert.alert('Google OAuth', error.message || 'No se pudo iniciar sesión con Google.');
     } finally {
       setLoading(false);
     }
@@ -91,15 +106,15 @@ export default function LoginScreen() {
               <Ionicons name="shield-checkmark" size={28} color={COLORS.primary} />
             </View>
             <Text style={styles.appName}>Conductor Pro</Text>
-            <Text style={styles.appTagline}>Gestión Financiera para Conductores de Transporte</Text>
+            <Text style={styles.appTagline}>Gestión Financiera & Control Operativo por Cuenta</Text>
           </View>
 
           {/* Subtitle */}
           <Text style={styles.formTitle}>
-            {isSignUp ? 'Registro de Cuenta' : 'Acceso Institucional'}
+            {isSignUp ? 'Registro de Cuenta Individual' : 'Acceso Institucional por Usuario'}
           </Text>
           <Text style={styles.formSubtitle}>
-            Control preciso de retención SII, gastos operativos y líquido neto
+            Sus datos financieros se almacenan de forma privada e aislada por cuenta
           </Text>
 
           {/* Form Inputs */}
@@ -164,7 +179,7 @@ export default function LoginScreen() {
           {/* Toggle Login / SignUp */}
           <TouchableOpacity style={styles.toggleButton} onPress={() => setIsSignUp(!isSignUp)}>
             <Text style={styles.toggleText}>
-              {isSignUp ? '¿Ya tienes cuenta? Inicia sesión' : '¿Nuevo usuario? Crear cuenta corporativa'}
+              {isSignUp ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Registrate aquí'}
             </Text>
           </TouchableOpacity>
 
@@ -239,7 +254,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   formTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: COLORS.text,
     textAlign: 'center',
