@@ -7,7 +7,7 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../_layout';
 import { supabase } from '../../lib/supabase';
@@ -16,53 +16,6 @@ import { MetricCard } from '../../components/MetricCard';
 import { ProgressBar } from '../../components/ProgressBar';
 import { formatCLP } from '../../utils/calculations';
 import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
-
-const MOCK_SHIFTS: DailyShift[] = [
-  {
-    id: '1',
-    user_id: 'demo',
-    shift_date: new Date().toISOString().split('T')[0],
-    gross_earnings: 75000,
-    cash_collected: 20000,
-    hours: 7.5,
-    distance_km: 180,
-    fuel_consumption: 7.4,
-    gas_price_per_liter: 1450,
-    sii_tax_rate: 0.1525,
-    sii_tax_amount: 11438,
-    app_liquid: 63562,
-    app_balance: 43562,
-    fuel_liters: 13.32,
-    fuel_cost: 19314,
-    pocket_net: 44248,
-    pocket_net_per_hour: 5900,
-    pocket_net_per_km: 246,
-    avg_speed_kmh: 24.0,
-    is_deleted: false,
-  },
-  {
-    id: '2',
-    user_id: 'demo',
-    shift_date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0],
-    gross_earnings: 88000,
-    cash_collected: 35000,
-    hours: 8.0,
-    distance_km: 210,
-    fuel_consumption: 7.4,
-    gas_price_per_liter: 1450,
-    sii_tax_rate: 0.1525,
-    sii_tax_amount: 13420,
-    app_liquid: 74580,
-    app_balance: 39580,
-    fuel_liters: 15.54,
-    fuel_cost: 22533,
-    pocket_net: 52047,
-    pocket_net_per_hour: 6506,
-    pocket_net_per_km: 248,
-    avg_speed_kmh: 26.3,
-    is_deleted: false,
-  },
-];
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -74,7 +27,7 @@ export default function DashboardScreen() {
   const fetchShifts = useCallback(async () => {
     try {
       if (!user) {
-        setShifts(MOCK_SHIFTS);
+        setShifts([]);
         setLoading(false);
         return;
       }
@@ -93,23 +46,22 @@ export default function DashboardScreen() {
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        setShifts(data as DailyShift[]);
-      } else {
-        setShifts(MOCK_SHIFTS);
-      }
+      setShifts((data as DailyShift[]) || []);
     } catch (e) {
       console.warn('Error fetching shifts:', e);
-      setShifts(MOCK_SHIFTS);
+      setShifts([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, [user]);
 
-  useEffect(() => {
-    fetchShifts();
-  }, [fetchShifts]);
+  // Re-fetch automatically whenever Dashboard screen receives focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchShifts();
+    }, [fetchShifts])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -165,24 +117,35 @@ export default function DashboardScreen() {
       {/* Target Progress Bar */}
       <ProgressBar current={totalPocketNet} target={monthlyTarget} label="Meta Mensual Líquida" />
 
-      {/* Corporate Pace Calculator */}
-      <View style={styles.paceCard}>
-        <View style={styles.paceHeaderRow}>
-          <Ionicons name="calculator-outline" size={16} color={COLORS.primary} />
-          <Text style={styles.paceTitle}>Proyección Operativa</Text>
+      {/* Empty State Banner if no shifts */}
+      {activeShifts.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Ionicons name="document-text-outline" size={24} color={COLORS.textMuted} style={{ marginBottom: 8 }} />
+          <Text style={styles.emptyTitle}>Sin turnos registrados este mes</Text>
+          <Text style={styles.emptySubtext}>
+            Presione el botón "Registrar Turno" arriba para ingresar su primera jornada del mes.
+          </Text>
         </View>
+      ) : (
+        /* Corporate Pace Calculator */
+        <View style={styles.paceCard}>
+          <View style={styles.paceHeaderRow}>
+            <Ionicons name="calculator-outline" size={16} color={COLORS.primary} />
+            <Text style={styles.paceTitle}>Proyección Operativa</Text>
+          </View>
 
-        {remainingPocket > 0 ? (
-          <Text style={styles.paceBodyText}>
-            A una tasa promedio de <Text style={styles.paceHighlight}>{formatCLP(avgNetPerHour)}/h</Text>, se requieren aproximadamente{' '}
-            <Text style={styles.paceHighlight}>{hoursNeeded} horas</Text> (~{daysNeeded} jornadas) para alcanzar el objetivo mensual.
-          </Text>
-        ) : (
-          <Text style={styles.paceBodyTextSuccess}>
-            Meta de {formatCLP(monthlyTarget)} alcanzada. Los ingresos adicionales constituyen excedente neto.
-          </Text>
-        )}
-      </View>
+          {remainingPocket > 0 ? (
+            <Text style={styles.paceBodyText}>
+              A una tasa promedio de <Text style={styles.paceHighlight}>{formatCLP(avgNetPerHour)}/h</Text>, se requieren aproximadamente{' '}
+              <Text style={styles.paceHighlight}>{hoursNeeded} horas</Text> (~{daysNeeded} jornadas) para alcanzar el objetivo mensual.
+            </Text>
+          ) : (
+            <Text style={styles.paceBodyTextSuccess}>
+              Meta de {formatCLP(monthlyTarget)} alcanzada. Los ingresos adicionales constituyen excedente neto.
+            </Text>
+          )}
+        </View>
+      )}
 
       {/* Main KPI Cards Grid */}
       <Text style={styles.sectionTitle}>Métricas Financieras del Período</Text>
@@ -300,6 +263,27 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 12,
+  },
+  emptyCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: 16,
+    ...SHADOWS.card,
+  },
+  emptyTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  emptySubtext: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    marginTop: 4,
   },
   paceCard: {
     backgroundColor: COLORS.surface,

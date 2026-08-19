@@ -30,15 +30,17 @@ export default function NewShiftScreen() {
   const [shiftDate, setShiftDate] = useState(getTodayString());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const [grossEarningsStr, setGrossEarningsStr] = useState('75000');
-  const [cashCollectedStr, setCashCollectedStr] = useState('15000');
-  const [hoursStr, setHoursStr] = useState('7');
-  const [minutesStr, setMinutesStr] = useState('30');
-  const [distanceKmStr, setDistanceKmStr] = useState('175');
+  // Clean empty defaults (no prefilled dummy numbers)
+  const [grossEarningsStr, setGrossEarningsStr] = useState('');
+  const [cashCollectedStr, setCashCollectedStr] = useState('');
+  const [hoursStr, setHoursStr] = useState('');
+  const [minutesStr, setMinutesStr] = useState('');
+  const [distanceKmStr, setDistanceKmStr] = useState('');
   const [fuelConsumptionStr, setFuelConsumptionStr] = useState('7.4');
   const [gasPriceStr, setGasPriceStr] = useState('1450');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -77,12 +79,7 @@ export default function NewShiftScreen() {
 
   const liveMetrics = useMemo(() => calculateDailyMetrics(shiftInput), [shiftInput]);
 
-  const handleSaveShift = async () => {
-    if (!grossEarningsStr || parseFloat(grossEarningsStr) <= 0) {
-      Alert.alert('Atención', 'Por favor ingresa un monto válido de ganancia bruta.');
-      return;
-    }
-
+  const executeSaveShift = async (existingId?: string) => {
     setSaving(true);
     try {
       const shiftData = {
@@ -109,20 +106,71 @@ export default function NewShiftScreen() {
       };
 
       if (user) {
-        const { error } = await supabase.from('daily_shifts').insert([shiftData]);
-        if (error) throw error;
+        if (existingId) {
+          // Overwrite existing shift for this date
+          const { error } = await supabase
+            .from('daily_shifts')
+            .update(shiftData)
+            .eq('id', existingId);
+          if (error) throw error;
+        } else {
+          // Insert new shift
+          const { error } = await supabase.from('daily_shifts').insert([shiftData]);
+          if (error) throw error;
+        }
       }
 
-      Alert.alert('Registro Exitoso', 'El turno ha sido guardado correctamente.', [
-        {
-          text: 'Ir al Dashboard',
-          onPress: () => router.replace('/(tabs)'),
-        },
-      ]);
+      setSaveSuccess(true);
+      setTimeout(() => {
+        router.replace('/(tabs)');
+      }, 900);
     } catch (e: any) {
       Alert.alert('Error', e.message || 'No se pudo guardar el turno');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveShift = async () => {
+    if (!grossEarningsStr || parseFloat(grossEarningsStr) <= 0) {
+      Alert.alert('Atención', 'Por favor ingresa un monto válido de ganancia bruta.');
+      return;
+    }
+
+    if (!user) {
+      executeSaveShift();
+      return;
+    }
+
+    // Check if shift already exists for this date
+    try {
+      const { data: existing } = await supabase
+        .from('daily_shifts')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('shift_date', shiftDate)
+        .eq('is_deleted', false)
+        .maybeSingle();
+
+      if (existing) {
+        Alert.alert(
+          'Registro Ya Existente',
+          `Ya existe un turno guardado para el día ${shiftDate}. ¿Deseas reemplazarlo con esta nueva información?`,
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            {
+              text: 'Reemplazar Registro',
+              style: 'destructive',
+              onPress: () => executeSaveShift(existing.id),
+            },
+          ]
+        );
+        return;
+      }
+
+      await executeSaveShift();
+    } catch (e) {
+      await executeSaveShift();
     }
   };
 
@@ -134,6 +182,17 @@ export default function NewShiftScreen() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Registro de Jornada Operativa</Text>
         <Text style={styles.subtitle}>Ingrese las métricas observadas al cierre de turno</Text>
+
+        {/* Visual Confirmation Banner upon saving */}
+        {saveSuccess && (
+          <View style={styles.successCard}>
+            <Ionicons name="checkmark-circle" size={24} color={COLORS.success} />
+            <View>
+              <Text style={styles.successTitle}>¡Turno Guardado Correctamente!</Text>
+              <Text style={styles.successSubtext}>Actualizando métricas consolidadas...</Text>
+            </View>
+          </View>
+        )}
 
         {/* Live Metrics Summary Card */}
         <LiveSummaryCard metrics={liveMetrics} siiTaxRatePercentage={siiTaxRate * 100} />
@@ -164,7 +223,7 @@ export default function NewShiftScreen() {
                 value={grossEarningsStr}
                 onChangeText={setGrossEarningsStr}
                 keyboardType="numeric"
-                placeholder="75000"
+                placeholder="Ej: 75000"
                 placeholderTextColor={COLORS.textMuted}
               />
             </View>
@@ -180,7 +239,7 @@ export default function NewShiftScreen() {
                 value={cashCollectedStr}
                 onChangeText={setCashCollectedStr}
                 keyboardType="numeric"
-                placeholder="15000"
+                placeholder="Ej: 15000"
                 placeholderTextColor={COLORS.textMuted}
               />
             </View>
@@ -196,7 +255,7 @@ export default function NewShiftScreen() {
                   value={hoursStr}
                   onChangeText={setHoursStr}
                   keyboardType="numeric"
-                  placeholder="7"
+                  placeholder="Ej: 7"
                   placeholderTextColor={COLORS.textMuted}
                 />
                 <Text style={styles.unitSuffix}>Horas</Text>
@@ -210,7 +269,7 @@ export default function NewShiftScreen() {
                   value={minutesStr}
                   onChangeText={setMinutesStr}
                   keyboardType="numeric"
-                  placeholder="30"
+                  placeholder="Ej: 30"
                   placeholderTextColor={COLORS.textMuted}
                 />
                 <Text style={styles.unitSuffix}>Mins</Text>
@@ -228,7 +287,7 @@ export default function NewShiftScreen() {
                 value={distanceKmStr}
                 onChangeText={setDistanceKmStr}
                 keyboardType="decimal-pad"
-                placeholder="175"
+                placeholder="Ej: 175"
                 placeholderTextColor={COLORS.textMuted}
               />
               <Text style={styles.unitSuffix}>km</Text>
@@ -279,7 +338,7 @@ export default function NewShiftScreen() {
                 onChangeText={setNotes}
                 multiline
                 numberOfLines={2}
-                placeholder="Notas de la jornada..."
+                placeholder="Notas opcionales de la jornada..."
                 placeholderTextColor={COLORS.textMuted}
               />
             </View>
@@ -289,7 +348,7 @@ export default function NewShiftScreen() {
           <TouchableOpacity
             style={styles.saveButton}
             onPress={handleSaveShift}
-            disabled={saving}
+            disabled={saving || saveSuccess}
             activeOpacity={0.8}
           >
             {saving ? (
@@ -331,6 +390,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
     marginBottom: 8,
+  },
+  successCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.successSoft,
+    borderRadius: RADIUS.md,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: COLORS.success + '44',
+    gap: 12,
+    marginVertical: 10,
+  },
+  successTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.success,
+  },
+  successSubtext: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
   formCard: {
     backgroundColor: COLORS.surface,

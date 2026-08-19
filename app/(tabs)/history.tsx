@@ -13,60 +13,12 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from 'expo-router';
 import { useAuth } from '../_layout';
 import { supabase } from '../../lib/supabase';
 import { DailyShift, ShiftInput } from '../../types/database';
 import { formatCLP, formatDateSpanish, formatHoursDecimal, calculateDailyMetrics } from '../../utils/calculations';
 import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
-
-const DEMO_HISTORY: DailyShift[] = [
-  {
-    id: 'demo-1',
-    user_id: 'demo',
-    shift_date: '2026-08-18',
-    gross_earnings: 82000,
-    cash_collected: 25000,
-    hours: 8.0,
-    distance_km: 195,
-    fuel_consumption: 7.4,
-    gas_price_per_liter: 1450,
-    sii_tax_rate: 0.1525,
-    sii_tax_amount: 12505,
-    app_liquid: 69495,
-    app_balance: 44495,
-    fuel_liters: 14.43,
-    fuel_cost: 20924,
-    pocket_net: 48571,
-    pocket_net_per_hour: 6071,
-    pocket_net_per_km: 249,
-    avg_speed_kmh: 24.4,
-    notes: 'Jornada nocturna',
-    is_deleted: false,
-  },
-  {
-    id: 'demo-2',
-    user_id: 'demo',
-    shift_date: '2026-08-17',
-    gross_earnings: 95000,
-    cash_collected: 30000,
-    hours: 9.2,
-    distance_km: 230,
-    fuel_consumption: 7.8,
-    gas_price_per_liter: 1450,
-    sii_tax_rate: 0.1525,
-    sii_tax_amount: 14488,
-    app_liquid: 80512,
-    app_balance: 50512,
-    fuel_liters: 17.94,
-    fuel_cost: 26013,
-    pocket_net: 54499,
-    pocket_net_per_hour: 5924,
-    pocket_net_per_km: 237,
-    avg_speed_kmh: 25.0,
-    notes: 'Tráfico alto en hora punta',
-    is_deleted: false,
-  },
-];
 
 export default function HistoryScreen() {
   const { user } = useAuth();
@@ -88,7 +40,7 @@ export default function HistoryScreen() {
   const fetchHistory = useCallback(async () => {
     try {
       if (!user) {
-        setShifts(DEMO_HISTORY);
+        setShifts([]);
         return;
       }
 
@@ -100,22 +52,21 @@ export default function HistoryScreen() {
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        setShifts(data as DailyShift[]);
-      } else {
-        setShifts(DEMO_HISTORY);
-      }
+      setShifts((data as DailyShift[]) || []);
     } catch (e) {
       console.warn('Error loading history:', e);
-      setShifts(DEMO_HISTORY);
+      setShifts([]);
     } finally {
       setRefreshing(false);
     }
   }, [user]);
 
-  useEffect(() => {
-    fetchHistory();
-  }, [fetchHistory]);
+  // Re-fetch automatically when screen receives focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchHistory();
+    }, [fetchHistory])
+  );
 
   const displayedShifts = shifts.filter((s) =>
     activeTab === 'trash' ? s.is_deleted === true : !s.is_deleted
@@ -370,8 +321,9 @@ export default function HistoryScreen() {
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
+            <Ionicons name="document-text-outline" size={24} color={COLORS.textMuted} style={{ marginBottom: 6 }} />
             <Text style={styles.emptyText}>
-              {activeTab === 'trash' ? 'La papelera está vacía.' : 'No hay turnos registrados.'}
+              {activeTab === 'trash' ? 'La papelera está vacía.' : 'No hay turnos registrados en tu cuenta.'}
             </Text>
           </View>
         }
