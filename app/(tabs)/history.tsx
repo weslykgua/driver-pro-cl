@@ -91,59 +91,87 @@ export default function HistoryScreen() {
   const handleMoveToTrash = async (shiftId: string) => {
     try {
       if (user) {
-        await supabase
+        const { error } = await supabase
           .from('daily_shifts')
           .update({ is_deleted: true })
           .eq('id', shiftId);
+        if (error) throw error;
       }
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setShifts((prev: DailyShift[]) =>
         prev.map((s: DailyShift) => (s.id === shiftId ? { ...s, is_deleted: true } : s))
       );
-      Alert.alert('Papelera', 'El turno ha sido trasladado a la papelera.');
-    } catch (e) {
-      Alert.alert('Error', 'No se pudo mover el registro a la papelera.');
+      const msg = 'El turno ha sido trasladado a la papelera.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Papelera', msg);
+    } catch (e: any) {
+      const msg = e?.message || 'No se pudo mover el registro a la papelera.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Error', msg);
     }
   };
 
   const handleRestoreFromTrash = async (shiftId: string) => {
     try {
       if (user) {
-        await supabase
+        const { error } = await supabase
           .from('daily_shifts')
           .update({ is_deleted: false })
           .eq('id', shiftId);
+        if (error) throw error;
       }
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setShifts((prev: DailyShift[]) =>
         prev.map((s: DailyShift) => (s.id === shiftId ? { ...s, is_deleted: false } : s))
       );
-      Alert.alert('Restaurado', 'El registro se ha restaurado correctamente.');
-    } catch (e) {
-      Alert.alert('Error', 'No se pudo restaurar el registro.');
+      const msg = 'El registro se ha restaurado correctamente.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Restaurado', msg);
+    } catch (e: any) {
+      const msg = e?.message || 'No se pudo restaurar el registro.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Error', msg);
+    }
+  };
+
+  const executePermanentDelete = async (shiftId: string) => {
+    try {
+      if (user) {
+        const { error } = await supabase.from('daily_shifts').delete().eq('id', shiftId);
+        if (error) throw error;
+      }
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setShifts((prev: DailyShift[]) => prev.filter((s: DailyShift) => s.id !== shiftId));
+      const msg = 'El registro ha sido eliminado permanentemente.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Eliminado', msg);
+    } catch (e: any) {
+      const msg = e?.message || 'No se pudo eliminar el registro.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Error', msg);
     }
   };
 
   const handlePermanentDelete = (shiftId: string) => {
-    Alert.alert(
-      'Eliminación Definitiva',
-      '¿Desea eliminar de forma permanente este registro? Esta acción no se puede deshacer.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar Definitivamente',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              if (user) {
-                await supabase.from('daily_shifts').delete().eq('id', shiftId);
-              }
-              setShifts((prev: DailyShift[]) => prev.filter((s: DailyShift) => s.id !== shiftId));
-            } catch (e) {
-              Alert.alert('Error', 'No se pudo eliminar el registro.');
-            }
+    const confirmMsg = '¿Desea eliminar de forma permanente este registro? Esta acción no se puede deshacer.';
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      if (window.confirm(confirmMsg)) {
+        executePermanentDelete(shiftId);
+      }
+    } else {
+      Alert.alert(
+        'Eliminación Definitiva',
+        confirmMsg,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Eliminar Definitivamente',
+            style: 'destructive',
+            onPress: () => executePermanentDelete(shiftId),
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
   const handleOpenEditModal = (shift: DailyShift) => {
