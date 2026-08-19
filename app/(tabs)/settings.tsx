@@ -66,7 +66,7 @@ export default function SettingsScreen() {
   };
 
   const handleSignOut = async () => {
-    Alert.alert('Cerrar Sesión', '¿Desea cerrar su sesión y revocar el token activo?', [
+    Alert.alert('Cerrar Sesión', '¿Desea cerrar su sesión activa?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Cerrar Sesión',
@@ -91,7 +91,7 @@ export default function SettingsScreen() {
         </View>
         <View style={styles.profileInfo}>
           <Text style={styles.userEmail}>{user?.email || 'Cuenta no autenticada'}</Text>
-          <Text style={styles.userStatus}>Sesión JWT Activa & Cifrada</Text>
+          <Text style={styles.userStatus}>Sesión Activa</Text>
         </View>
       </View>
 
@@ -188,7 +188,7 @@ export default function SettingsScreen() {
       {/* Sign Out */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.8}>
         <Ionicons name="log-out-outline" size={16} color={COLORS.danger} style={{ marginRight: 6 }} />
-        <Text style={styles.logoutButtonText}>Cerrar Sesión & Revocar Token JWT</Text>
+        <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
       </TouchableOpacity>
     </ScrollView>
   );
