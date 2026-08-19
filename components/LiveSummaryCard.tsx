@@ -17,7 +17,14 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
       {/* Main Net Income */}
       <View style={styles.heroContainer}>
         <Text style={[styles.heroLabel, { color: colors.textSecondary }]}>Líquido Neto Estimado en Bolsillo</Text>
-        <Text style={[styles.heroValue, { color: colors.success }]}>{formatCLP(metrics.pocketNet)}</Text>
+        <Text
+          style={[styles.heroValue, { color: colors.success }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+        >
+          {formatCLP(metrics.pocketNet)}
+        </Text>
         <Text style={[styles.heroSubtext, { color: colors.textMuted }]}>Monto disponible tras retención legal SII y gasto estimado de combustible</Text>
       </View>
 
@@ -48,18 +55,60 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
       {/* Performance KPIs */}
       <View style={styles.kpiRow}>
         <View style={[styles.kpiBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
-          <Text style={[styles.kpiLabel, { color: colors.textMuted }]}>Rendimiento / Hora</Text>
-          <Text style={[styles.kpiValue, { color: colors.text }]}>{formatCLP(metrics.pocketNetPerHour)}/h</Text>
+          <Text
+            style={[styles.kpiLabel, { color: colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            Rendimiento / Hora
+          </Text>
+          <Text
+            style={[styles.kpiValue, { color: colors.text }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            {formatCLP(metrics.pocketNetPerHour)}/h
+          </Text>
         </View>
 
         <View style={[styles.kpiBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
-          <Text style={[styles.kpiLabel, { color: colors.textMuted }]}>Rendimiento / Km</Text>
-          <Text style={[styles.kpiValue, { color: colors.text }]}>{formatCLP(metrics.pocketNetPerKm)}/km</Text>
+          <Text
+            style={[styles.kpiLabel, { color: colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            Rendimiento / Km
+          </Text>
+          <Text
+            style={[styles.kpiValue, { color: colors.text }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            {formatCLP(metrics.pocketNetPerKm)}/km
+          </Text>
         </View>
 
         <View style={[styles.kpiBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
-          <Text style={[styles.kpiLabel, { color: colors.textMuted }]}>Velocidad Promedio</Text>
-          <Text style={[styles.kpiValue, { color: colors.text }]}>{metrics.avgSpeedKmh} km/h</Text>
+          <Text
+            style={[styles.kpiLabel, { color: colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            Velocidad Promedio
+          </Text>
+          <Text
+            style={[styles.kpiValue, { color: colors.text }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            {metrics.avgSpeedKmh} km/h
+          </Text>
         </View>
       </View>
     </View>

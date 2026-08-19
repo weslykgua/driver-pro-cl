@@ -158,9 +158,9 @@ export default function DashboardScreen() {
     >
       {/* Brand Header */}
       <View style={styles.headerRow}>
-        <View>
+        <View style={styles.headerTitleContainer}>
           <Text style={[styles.brandTitle, { color: colors.text }]}>TripRate</Text>
-          <Text style={[styles.brandSubtext, { color: colors.textSecondary }]}>
+          <Text style={[styles.brandSubtext, { color: colors.textSecondary }]} numberOfLines={1}>
             Control financiero para conductores
           </Text>
         </View>
@@ -171,7 +171,9 @@ export default function DashboardScreen() {
           activeOpacity={0.8}
         >
           <Ionicons name="add" size={16} color={colors.primaryText} />
-          <Text style={[styles.primaryButtonText, { color: colors.primaryText }]}>Registrar Turno</Text>
+          <Text style={[styles.primaryButtonText, { color: colors.primaryText }]} numberOfLines={1}>
+            Registrar Turno
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -185,7 +187,12 @@ export default function DashboardScreen() {
           onPress={() => handleRangeChange('month')}
           activeOpacity={0.8}
         >
-          <Text style={[styles.timeOptionText, { color: timeRange === 'month' ? colors.primary : colors.textMuted }]}>
+          <Text
+            style={[styles.timeOptionText, { color: timeRange === 'month' ? colors.primary : colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
             Este Mes
           </Text>
         </TouchableOpacity>
@@ -198,7 +205,12 @@ export default function DashboardScreen() {
           onPress={() => handleRangeChange('week')}
           activeOpacity={0.8}
         >
-          <Text style={[styles.timeOptionText, { color: timeRange === 'week' ? colors.primary : colors.textMuted }]}>
+          <Text
+            style={[styles.timeOptionText, { color: timeRange === 'week' ? colors.primary : colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
             Esta Semana
           </Text>
         </TouchableOpacity>
@@ -211,7 +223,12 @@ export default function DashboardScreen() {
           onPress={() => handleRangeChange('today')}
           activeOpacity={0.8}
         >
-          <Text style={[styles.timeOptionText, { color: timeRange === 'today' ? colors.primary : colors.textMuted }]}>
+          <Text
+            style={[styles.timeOptionText, { color: timeRange === 'today' ? colors.primary : colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
             Hoy
           </Text>
         </TouchableOpacity>
@@ -224,7 +241,12 @@ export default function DashboardScreen() {
           onPress={() => handleRangeChange('all')}
           activeOpacity={0.8}
         >
-          <Text style={[styles.timeOptionText, { color: timeRange === 'all' ? colors.primary : colors.textMuted }]}>
+          <Text
+            style={[styles.timeOptionText, { color: timeRange === 'all' ? colors.primary : colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
             Todo
           </Text>
         </TouchableOpacity>
@@ -347,6 +369,10 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     marginTop: 8,
   },
+  headerTitleContainer: {
+    flex: 1,
+    marginRight: 8,
+  },
   brandTitle: {
     fontSize: 22,
     fontWeight: '700',
@@ -358,11 +384,12 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flexDirection: 'row',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     gap: 6,
+    flexShrink: 0,
   },
   primaryButtonText: {
     fontWeight: '700',

@@ -25,9 +25,11 @@ export default function TabsLayout() {
             <View style={[styles.desktopLogoBadge, { backgroundColor: colors.neutralSoft, borderColor: colors.border }]}>
               <Ionicons name="bar-chart-outline" size={18} color={colors.primary} />
             </View>
-            <View>
+            <View style={styles.brandTitleContainer}>
               <Text style={[styles.desktopBrandName, { color: colors.primary }]}>TripRate</Text>
-              <Text style={[styles.desktopBrandSubtitle, { color: colors.textMuted }]}>Gestión Financiera & Control Operativo</Text>
+              <Text style={[styles.desktopBrandSubtitle, { color: colors.textMuted }]} numberOfLines={1}>
+                Gestión Financiera & Control Operativo
+              </Text>
             </View>
           </View>
 
@@ -153,6 +155,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+    flex: 1,
+    marginRight: 8,
+  },
+  brandTitleContainer: {
+    flex: 1,
   },
   desktopLogoBadge: {
     width: 34,
@@ -161,6 +168,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
+    flexShrink: 0,
   },
   desktopBrandName: {
     fontSize: 16,
@@ -178,6 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm,
     borderWidth: 1,
     gap: 6,
+    flexShrink: 0,
   },
   themeToggleText: {
     fontSize: 12,

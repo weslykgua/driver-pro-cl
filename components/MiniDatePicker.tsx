@@ -188,10 +188,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
-    paddingHorizontal: 4,
   },
   dayOfWeekText: {
-    width: 38,
+    width: '14.28%',
     textAlign: 'center',
     fontSize: 12,
     fontWeight: '600',
@@ -201,12 +200,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   dayCellEmpty: {
-    width: 42,
-    height: 40,
+    width: '14.28%',
+    height: 38,
   },
   dayCell: {
-    width: 42,
-    height: 40,
+    width: '14.28%',
+    height: 38,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: RADIUS.sm,

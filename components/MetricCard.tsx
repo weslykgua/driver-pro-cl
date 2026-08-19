@@ -46,7 +46,12 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       style
     ]}>
       <View style={styles.headerRow}>
-        <Text style={[styles.title, { color: colors.textSecondary }]} numberOfLines={1}>
+        <Text
+          style={[styles.title, { color: colors.textSecondary }]}
+          numberOfLines={2}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
           {title}
         </Text>
         {iconName && (
@@ -56,11 +61,20 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         )}
       </View>
 
-      <Text style={[styles.value, { color: vStyles.valueColor }]}>{value}</Text>
+      <Text
+        style={[styles.value, { color: vStyles.valueColor }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+      >
+        {value}
+      </Text>
       
       {subtitle && (
         <View style={styles.subtitleContainer}>
-          <Text style={[styles.subtitleText, { color: colors.textMuted }]}>{subtitle}</Text>
+          <Text style={[styles.subtitleText, { color: colors.textMuted }]} numberOfLines={2}>
+            {subtitle}
+          </Text>
         </View>
       )}
     </View>

@@ -388,14 +388,18 @@ export default function HistoryScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header Bar */}
       <View style={styles.headerRow}>
-        <View>
+        <View style={styles.headerTitleContainer}>
           <Text style={[styles.title, { color: colors.text }]}>Historial de Operaciones</Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{shifts.filter((s) => !s.is_deleted).length} registros activos</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
+            {shifts.filter((s) => !s.is_deleted).length} registros activos
+          </Text>
         </View>
 
         <TouchableOpacity style={[styles.exportButton, { backgroundColor: colors.surface, borderColor: colors.borderDark }]} onPress={exportToExcel} activeOpacity={0.8}>
           <Ionicons name="document-text-outline" size={15} color={colors.primary} />
-          <Text style={[styles.exportButtonText, { color: colors.primary }]}>Exportar Excel</Text>
+          <Text style={[styles.exportButtonText, { color: colors.primary }]} numberOfLines={1}>
+            Exportar Excel
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -405,7 +409,12 @@ export default function HistoryScreen() {
           style={[styles.tabSelectorButton, activeTab === 'active' && [styles.tabSelectorActive, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]]}
           onPress={() => handleSelectTab('active')}
         >
-          <Text style={[styles.tabSelectorText, { color: activeTab === 'active' ? colors.primary : colors.textMuted }]}>
+          <Text
+            style={[styles.tabSelectorText, { color: activeTab === 'active' ? colors.primary : colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
             Registros Activos
           </Text>
         </TouchableOpacity>
@@ -415,7 +424,12 @@ export default function HistoryScreen() {
           onPress={() => handleSelectTab('trash')}
         >
           <Ionicons name="trash-outline" size={14} color={activeTab === 'trash' ? colors.danger : colors.textMuted} style={{ marginRight: 4 }} />
-          <Text style={[styles.tabSelectorText, { color: activeTab === 'trash' ? colors.danger : colors.textMuted }]}>
+          <Text
+            style={[styles.tabSelectorText, { color: activeTab === 'trash' ? colors.danger : colors.textMuted }]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
             Papelera ({trashCount})
           </Text>
         </TouchableOpacity>
@@ -727,6 +741,10 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     marginTop: 8,
   },
+  headerTitleContainer: {
+    flex: 1,
+    marginRight: 8,
+  },
   title: {
     fontSize: 20,
     fontWeight: '700',
@@ -744,6 +762,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     borderWidth: 1,
+    flexShrink: 0,
   },
   exportButtonText: {
     fontWeight: '600',
@@ -763,6 +782,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: RADIUS.sm - 2,
+    paddingHorizontal: 4,
   },
   tabSelectorActive: {
     borderWidth: 1,
@@ -835,13 +855,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
   },
   detailLabel: {
     fontSize: 12,
+    flex: 1,
+    flexShrink: 1,
   },
   detailValue: {
     fontSize: 12,
     fontWeight: '600',
+    textAlign: 'right',
   },
   notesBox: {
     padding: 8,
@@ -855,7 +879,8 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    gap: 10,
+    flexWrap: 'wrap',
+    gap: 8,
     marginTop: 14,
   },
   editButton: {

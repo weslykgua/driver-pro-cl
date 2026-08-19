@@ -17,11 +17,25 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label
   return (
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.textSecondary }]}>{label}</Text>
+        <Text
+          style={[styles.title, { color: colors.textSecondary }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {label}
+        </Text>
         <Text style={[styles.percentageText, { color: colors.primary }]}>{percentage}% completado</Text>
       </View>
 
-      <Text style={[styles.targetValue, { color: colors.text }]}>{formatCLP(target)}</Text>
+      <Text
+        style={[styles.targetValue, { color: colors.text }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+      >
+        {formatCLP(target)}
+      </Text>
 
       {/* Progress Track */}
       <View style={[styles.track, { backgroundColor: colors.border }]}>
@@ -30,10 +44,10 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label
 
       {/* Bottom Details */}
       <View style={styles.footer}>
-        <Text style={[styles.currentText, { color: colors.textSecondary }]}>
+        <Text style={[styles.currentText, { color: colors.textSecondary }]} numberOfLines={1}>
           Acumulado: <Text style={[styles.highlight, { color: colors.primary }]}>{formatCLP(current)}</Text>
         </Text>
-        <Text style={[styles.remainingText, { color: colors.secondary }]}>
+        <Text style={[styles.remainingText, { color: colors.secondary }]} numberOfLines={1}>
           {remaining > 0 ? `Restante: ${formatCLP(remaining)}` : 'Meta Cumplida'}
         </Text>
       </View>
@@ -60,6 +74,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    flex: 1,
+    marginRight: 8,
   },
   targetValue: {
     fontSize: 26,
@@ -70,6 +86,7 @@ const styles = StyleSheet.create({
   percentageText: {
     fontSize: 12,
     fontWeight: '600',
+    flexShrink: 0,
   },
   track: {
     height: 6,
@@ -83,6 +100,8 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 4,
     marginTop: 12,
   },
   currentText: {
