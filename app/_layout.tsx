@@ -109,10 +109,11 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: '#0F172A' },
+            contentStyle: { backgroundColor: '#0B0F17' },
             animation: 'fade',
           }}
         >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0B0F17',
     ...(Platform.OS === 'web'
       ? {
           minHeight: '100vh' as any,
