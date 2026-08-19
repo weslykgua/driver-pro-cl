@@ -96,22 +96,22 @@ export default function DashboardScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
     >
-      {/* Header Bar */}
+      {/* Brand Header */}
       <View style={styles.headerRow}>
         <View>
-          <Text style={[styles.welcomeText, { color: colors.text }]}>Resumen Consolidado</Text>
-          <Text style={[styles.dateBadgeText, { color: colors.textSecondary }]}>
-            {new Date().toLocaleDateString('es-CL', { month: 'long', year: 'numeric' })}
+          <Text style={[styles.brandTitle, { color: colors.text }]}>TripRate</Text>
+          <Text style={[styles.brandSubtext, { color: colors.textSecondary }]}>
+            Control financiero para conductores
           </Text>
         </View>
 
         <TouchableOpacity
-          style={[styles.newShiftButton, { backgroundColor: colors.primary }]}
+          style={[styles.primaryButton, { backgroundColor: colors.primary }]}
           onPress={() => router.push('/(tabs)/new-shift')}
           activeOpacity={0.8}
         >
-          <Ionicons name="add" size={16} color="#FFFFFF" />
-          <Text style={styles.newShiftButtonText}>Registrar Turno</Text>
+          <Ionicons name="add" size={16} color={colors.primaryText} />
+          <Text style={[styles.primaryButtonText, { color: colors.primaryText }]}>Registrar Turno</Text>
         </TouchableOpacity>
       </View>
 
@@ -124,7 +124,7 @@ export default function DashboardScreen() {
           <Ionicons name="document-text-outline" size={24} color={colors.textMuted} style={{ marginBottom: 8 }} />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>Sin turnos registrados este mes</Text>
           <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
-            Presione el botón "Registrar Turno" arriba para ingresar su primera jornada del mes.
+            Presione el botón "Registrar Turno" para ingresar su primera jornada del mes.
           </Text>
         </View>
       ) : (
@@ -199,6 +199,17 @@ export default function DashboardScreen() {
             style={styles.halfCard}
           />
         </View>
+
+        <View style={styles.twoColumnRow}>
+          <MetricCard
+            title="Promedio / Km"
+            value={`${formatCLP(avgNetPerKm)}/km`}
+            subtitle={`${totalKm} km recorridos`}
+            iconName="navigate-outline"
+            variant="blue"
+            style={styles.fullWidthCard}
+          />
+        </View>
       </View>
     </ScrollView>
   );
@@ -219,28 +230,26 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 8,
   },
-  welcomeText: {
-    fontSize: 20,
+  brandTitle: {
+    fontSize: 22,
     fontWeight: '700',
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
   },
-  dateBadgeText: {
+  brandSubtext: {
     fontSize: 12,
-    textTransform: 'capitalize',
     marginTop: 2,
   },
-  newShiftButton: {
+  primaryButton: {
     flexDirection: 'row',
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     gap: 6,
   },
-  newShiftButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 12,
+  primaryButtonText: {
+    fontWeight: '700',
+    fontSize: 13,
   },
   emptyCard: {
     borderRadius: RADIUS.md,
@@ -273,10 +282,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   paceTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
   },
   paceBodyText: {
     fontSize: 13,
@@ -291,12 +300,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     marginTop: 8,
     marginBottom: 12,
     textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
   },
   gridContainer: {
     gap: 12,

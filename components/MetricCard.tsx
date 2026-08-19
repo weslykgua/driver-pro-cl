@@ -25,13 +25,13 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   const getVariantStyles = () => {
     switch (variant) {
       case 'emerald':
-        return { valueColor: colors.success, badgeBg: colors.successSoft, badgeText: colors.success };
+        return { valueColor: colors.primary, badgeBg: colors.successSoft, badgeText: colors.primary };
       case 'red':
         return { valueColor: colors.danger, badgeBg: colors.dangerSoft, badgeText: colors.danger };
       case 'amber':
         return { valueColor: colors.warning, badgeBg: colors.warningSoft, badgeText: colors.warning };
       case 'blue':
-        return { valueColor: colors.primary, badgeBg: colors.infoSoft, badgeText: colors.primary };
+        return { valueColor: colors.secondary, badgeBg: colors.infoSoft, badgeText: colors.secondary };
       default:
         return { valueColor: colors.text, badgeBg: colors.neutralSoft, badgeText: colors.textSecondary };
     }
@@ -51,7 +51,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
         </Text>
         {iconName && (
           <View style={[styles.iconWrapper, { backgroundColor: colors.neutralSoft }]}>
-            <Ionicons name={iconName} size={16} color={colors.textSecondary} />
+            <Ionicons name={iconName} size={15} color={colors.textSecondary} />
           </View>
         )}
       </View>
@@ -81,16 +81,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
     flex: 1,
     marginRight: 8,
   },
   iconWrapper: {
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   subtitleText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '400',
   },
 });

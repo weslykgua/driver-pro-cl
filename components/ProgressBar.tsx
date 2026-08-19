@@ -18,18 +18,20 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.textSecondary }]}>{label}</Text>
-        <Text style={[styles.percentageText, { color: colors.primary }]}>{percentage}%</Text>
+        <Text style={[styles.percentageText, { color: colors.primary }]}>{percentage}% completado</Text>
       </View>
 
+      <Text style={[styles.targetValue, { color: colors.text }]}>{formatCLP(target)}</Text>
+
       {/* Progress Track */}
-      <View style={[styles.track, { backgroundColor: colors.neutralSoft }]}>
+      <View style={[styles.track, { backgroundColor: colors.border }]}>
         <View style={[styles.fill, { width: `${percentage}%`, backgroundColor: colors.primary }]} />
       </View>
 
       {/* Bottom Details */}
       <View style={styles.footer}>
         <Text style={[styles.currentText, { color: colors.textSecondary }]}>
-          Acumulado: <Text style={[styles.highlight, { color: colors.text }]}>{formatCLP(current)}</Text>
+          Acumulado: <Text style={[styles.highlight, { color: colors.primary }]}>{formatCLP(current)}</Text>
         </Text>
         <Text style={[styles.remainingText, { color: colors.secondary }]}>
           {remaining > 0 ? `Restante: ${formatCLP(remaining)}` : 'Meta Cumplida'}
@@ -42,7 +44,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label
 const styles = StyleSheet.create({
   container: {
     borderRadius: RADIUS.md,
-    padding: 16,
+    padding: 18,
     borderWidth: 1,
     marginVertical: 12,
     ...SHADOWS.card,
@@ -51,20 +53,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 4,
   },
   title: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     textTransform: 'uppercase',
-    letterSpacing: 0.4,
+    letterSpacing: 0.5,
+  },
+  targetValue: {
+    fontSize: 26,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    marginBottom: 12,
   },
   percentageText: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
   },
   track: {
-    height: 8,
+    height: 6,
     borderRadius: RADIUS.full,
     overflow: 'hidden',
   },
@@ -75,7 +83,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 12,
   },
   currentText: {
     fontSize: 12,

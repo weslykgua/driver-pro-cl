@@ -1,82 +1,90 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useColorScheme as useDeviceColorScheme, Platform } from 'react-native';
 
-export type ThemeMode = 'system' | 'light' | 'dark';
+export type ThemeMode = 'dark' | 'light' | 'system';
 
 export interface ThemeColors {
   background: string;
+  backgroundSecondary: string;
   surface: string;
+  surfaceElevated: string;
   surfaceSubtle: string;
   border: string;
   borderDark: string;
-  primary: string;
+  primary: string;       // #22C55E (Verde Financiero)
   primaryHover: string;
-  secondary: string;
-  text: string;
-  textSecondary: string;
-  textMuted: string;
-  success: string;
-  successSoft: string;
-  danger: string;
-  dangerSoft: string;
-  warning: string;
-  warningSoft: string;
-  info: string;
-  infoSoft: string;
-  neutralSoft: string;
+  primaryText: string;   // #07110A
+  secondary: string;     // #3B82F6 (Azul Secundario)
+  text: string;          // #F1F5F9
+  textSecondary: string; // #94A3B8
+  textMuted: string;     // #64748B
+  success: string;       // #22C55E
+  successSoft: string;   // #064E3B
+  danger: string;        // #EF4444
+  dangerSoft: string;    // #450A0A
+  warning: string;       // #F59E0B
+  warningSoft: string;   // #78350F
+  info: string;          // #3B82F6
+  infoSoft: string;      // #1E3A8A
+  neutralSoft: string;   // #1A212B
   isDark: boolean;
 }
 
-export const LIGHT_COLORS: ThemeColors = {
-  background: '#F5F7FA',
-  surface: '#FFFFFF',
-  surfaceSubtle: '#F8FAFC',
-  border: '#E2E6EB',
-  borderDark: '#D9DEE5',
-  primary: '#123B5D',
-  primaryHover: '#0E2E49',
-  secondary: '#1F5A7A',
-  text: '#172033',
-  textSecondary: '#5F6B7A',
-  textMuted: '#8A94A3',
-  success: '#287A5A',
-  successSoft: '#E8F4EE',
-  danger: '#B54747',
-  dangerSoft: '#FDF2F2',
-  warning: '#A87520',
-  warningSoft: '#FDF8EE',
-  info: '#1F5A7A',
-  infoSoft: '#F0F5F9',
-  neutralSoft: '#F1F3F5',
-  isDark: false,
-};
-
-export const DARK_COLORS: ThemeColors = {
-  background: '#0B0F17',
-  surface: '#161E2E',
-  surfaceSubtle: '#1D2638',
-  border: '#243044',
+export const DARK_FINTECH_COLORS: ThemeColors = {
+  background: '#0B0F14',
+  backgroundSecondary: '#11161D',
+  surface: '#151B23',
+  surfaceElevated: '#1A212B',
+  surfaceSubtle: '#11161D',
+  border: '#252D38',
   borderDark: '#334155',
-  primary: '#38BDF8',
-  primaryHover: '#0284C7',
-  secondary: '#38BDF8',
+  primary: '#22C55E',
+  primaryHover: '#16A34A',
+  primaryText: '#07110A',
+  secondary: '#3B82F6',
   text: '#F1F5F9',
   textSecondary: '#94A3B8',
   textMuted: '#64748B',
-  success: '#34D399',
+  success: '#22C55E',
   successSoft: '#064E3B',
-  danger: '#F87171',
-  dangerSoft: '#7F1D1D',
-  warning: '#FBBF24',
+  danger: '#EF4444',
+  dangerSoft: '#450A0A',
+  warning: '#F59E0B',
   warningSoft: '#78350F',
-  info: '#38BDF8',
-  infoSoft: '#0C4A6E',
-  neutralSoft: '#1E293B',
+  info: '#3B82F6',
+  infoSoft: '#1E3A8A',
+  neutralSoft: '#1A212B',
   isDark: true,
 };
 
-// Fallback constant for backwards compatibility
-export const COLORS = LIGHT_COLORS;
+export const LIGHT_FINTECH_COLORS: ThemeColors = {
+  background: '#F8FAFC',
+  backgroundSecondary: '#F1F5F9',
+  surface: '#FFFFFF',
+  surfaceElevated: '#F8FAFC',
+  surfaceSubtle: '#F1F5F9',
+  border: '#E2E8F0',
+  borderDark: '#CBD5E1',
+  primary: '#16A34A',
+  primaryHover: '#15803D',
+  primaryText: '#FFFFFF',
+  secondary: '#2563EB',
+  text: '#0F172A',
+  textSecondary: '#475569',
+  textMuted: '#64748B',
+  success: '#16A34A',
+  successSoft: '#DCFCE7',
+  danger: '#DC2626',
+  dangerSoft: '#FEE2E2',
+  warning: '#D97706',
+  warningSoft: '#FEF3C7',
+  info: '#2563EB',
+  infoSoft: '#DBEAFE',
+  neutralSoft: '#F1F5F9',
+  isDark: false,
+};
+
+export const COLORS = DARK_FINTECH_COLORS;
 
 export const SPACING = {
   xs: 4,
@@ -97,11 +105,11 @@ export const RADIUS = {
 
 export const SHADOWS = {
   card: {
-    shadowColor: '#172033',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
   },
 };
 
@@ -112,18 +120,18 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const THEME_STORAGE_KEY = 'triprate_theme_mode_v1';
+const THEME_STORAGE_KEY = 'triprate_theme_mode_v2';
 
 const ThemeContext = createContext<ThemeContextType>({
-  themeMode: 'system',
-  colors: LIGHT_COLORS,
+  themeMode: 'dark',
+  colors: DARK_FINTECH_COLORS,
   setThemeMode: () => {},
   toggleTheme: () => {},
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const deviceScheme = useDeviceColorScheme();
-  const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('dark');
 
   useEffect(() => {
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
@@ -144,17 +152,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const toggleTheme = () => {
     if (themeMode === 'light') {
       setThemeMode('dark');
-    } else if (themeMode === 'dark') {
-      setThemeMode('light');
     } else {
-      setThemeMode(deviceScheme === 'dark' ? 'light' : 'dark');
+      setThemeMode('light');
     }
   };
 
   const isDark =
     themeMode === 'dark' || (themeMode === 'system' && deviceScheme === 'dark');
 
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  const colors = isDark ? DARK_FINTECH_COLORS : LIGHT_FINTECH_COLORS;
 
   return React.createElement(
     ThemeContext.Provider,

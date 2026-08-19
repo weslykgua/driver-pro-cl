@@ -15,11 +15,12 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
-import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const { colors } = useTheme();
   const isDesktop = Platform.OS === 'web' && width >= 768;
 
   const [email, setEmail] = useState('');
@@ -94,53 +95,57 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        <View style={[styles.cardContainer, isDesktop && styles.cardDesktop]}>
+        <View style={[
+          styles.cardContainer,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+          isDesktop && styles.cardDesktop
+        ]}>
           {/* Corporate Brand Header */}
           <View style={styles.brandContainer}>
-            <View style={styles.logoBadge}>
-              <Ionicons name="bar-chart" size={28} color={COLORS.primary} />
+            <View style={[styles.logoBadge, { backgroundColor: colors.neutralSoft, borderColor: colors.border }]}>
+              <Ionicons name="bar-chart" size={28} color={colors.primary} />
             </View>
-            <Text style={styles.appName}>TripRate</Text>
-            <Text style={styles.appTagline}>Gestión Financiera para Conductores</Text>
+            <Text style={[styles.appName, { color: colors.text }]}>TripRate</Text>
+            <Text style={[styles.appTagline, { color: colors.textSecondary }]}>Control financiero para conductores</Text>
           </View>
 
           {/* Subtitle */}
-          <Text style={styles.formTitle}>
+          <Text style={[styles.formTitle, { color: colors.text }]}>
             {isSignUp ? 'Crear Cuenta de Usuario' : 'Acceso por Cuenta'}
           </Text>
-          <Text style={styles.formSubtitle}>
+          <Text style={[styles.formSubtitle, { color: colors.textMuted }]}>
             Es necesario contar con una cuenta activa para guardar y consultar sus registros
           </Text>
 
-          {/* Google OAuth Button (Primary Option) */}
+          {/* Google OAuth Button */}
           <TouchableOpacity
-            style={styles.googleButton}
+            style={[styles.googleButton, { backgroundColor: colors.surfaceElevated, borderColor: colors.border }]}
             onPress={handleGoogleAuth}
             disabled={loading}
             activeOpacity={0.8}
           >
-            <Ionicons name="logo-google" size={18} color={COLORS.text} style={{ marginRight: 8 }} />
-            <Text style={styles.googleButtonText}>Continuar con Google</Text>
+            <Ionicons name="logo-google" size={18} color={colors.text} style={{ marginRight: 8 }} />
+            <Text style={[styles.googleButtonText, { color: colors.text }]}>Continuar con Google</Text>
           </TouchableOpacity>
 
           <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>O INGRESA CON EMAIL</Text>
-            <View style={styles.dividerLine} />
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            <Text style={[styles.dividerText, { color: colors.textMuted }]}>O INGRESA CON EMAIL</Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
           </View>
 
           {/* Email / Password Form */}
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Correo Electrónico</Text>
-            <View style={styles.inputWrapper}>
-              <Ionicons name="mail-outline" size={18} color={COLORS.textMuted} style={styles.inputIcon} />
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Correo Electrónico</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+              <Ionicons name="mail-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 placeholder="conductor@empresa.cl"
-                placeholderTextColor={COLORS.textMuted}
+                placeholderTextColor={colors.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -150,13 +155,13 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Contraseña</Text>
-            <View style={styles.inputWrapper}>
-              <Ionicons name="lock-closed-outline" size={18} color={COLORS.textMuted} style={styles.inputIcon} />
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Contraseña</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+              <Ionicons name="lock-closed-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { color: colors.text }]}
                 placeholder="••••••••"
-                placeholderTextColor={COLORS.textMuted}
+                placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
@@ -166,15 +171,15 @@ export default function LoginScreen() {
 
           {/* Primary Action Button */}
           <TouchableOpacity
-            style={styles.primaryButton}
+            style={[styles.primaryButton, { backgroundColor: colors.primary }]}
             onPress={handleEmailAuth}
             disabled={loading}
             activeOpacity={0.8}
           >
             {loading ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={colors.primaryText} />
             ) : (
-              <Text style={styles.primaryButtonText}>
+              <Text style={[styles.primaryButtonText, { color: colors.primaryText }]}>
                 {isSignUp ? 'Registrar Cuenta' : 'Iniciar Sesión'}
               </Text>
             )}
@@ -182,7 +187,7 @@ export default function LoginScreen() {
 
           {/* Toggle Sign In / Register */}
           <TouchableOpacity style={styles.toggleButton} onPress={() => setIsSignUp(!isSignUp)}>
-            <Text style={styles.toggleText}>
+            <Text style={[styles.toggleText, { color: colors.primary }]}>
               {isSignUp ? '¿Ya tienes cuenta? Inicia sesión aquí' : '¿No tienes cuenta? Registra tu correo'}
             </Text>
           </TouchableOpacity>
@@ -195,7 +200,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
     width: '100%',
   },
   scrollContent: {
@@ -205,13 +209,11 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   cardContainer: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 28,
     width: '100%',
     maxWidth: 440,
     borderWidth: 1,
-    borderColor: COLORS.border,
     ...SHADOWS.card,
   },
   cardDesktop: {
@@ -226,50 +228,41 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: RADIUS.md,
-    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   appName: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700',
-    color: COLORS.primary,
-    letterSpacing: -0.3,
+    letterSpacing: -0.5,
   },
   appTagline: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     marginTop: 4,
     textAlign: 'center',
   },
   formTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.text,
     textAlign: 'center',
   },
   formSubtitle: {
     fontSize: 12,
-    color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: 4,
     marginBottom: 20,
   },
   googleButton: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
     height: 46,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
   },
   googleButtonText: {
-    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -281,12 +274,10 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.border,
   },
   dividerText: {
     fontSize: 10,
     fontWeight: '700',
-    color: COLORS.textMuted,
     paddingHorizontal: 10,
     letterSpacing: 0.5,
   },
@@ -296,7 +287,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 6,
     textTransform: 'uppercase',
     letterSpacing: 0.3,
@@ -304,10 +294,8 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
     paddingHorizontal: 12,
     height: 44,
   },
@@ -316,11 +304,9 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    color: COLORS.text,
     fontSize: 14,
   },
   primaryButton: {
-    backgroundColor: COLORS.primary,
     height: 44,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
@@ -328,16 +314,14 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   toggleButton: {
     alignItems: 'center',
     marginTop: 16,
   },
   toggleText: {
-    color: COLORS.primary,
     fontSize: 13,
     fontWeight: '600',
   },

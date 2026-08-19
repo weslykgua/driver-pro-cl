@@ -5,7 +5,7 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
-import { ThemeProvider, useTheme, LIGHT_COLORS } from '../constants/theme';
+import { ThemeProvider, useTheme, LIGHT_FINTECH_COLORS } from '../constants/theme';
 import { CookieConsentBanner } from '../components/CookieConsentBanner';
 
 interface AuthContextType {
