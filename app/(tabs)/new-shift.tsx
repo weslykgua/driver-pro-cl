@@ -178,7 +178,13 @@ export default function NewShiftScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={[styles.container, { backgroundColor: colors.background }]}
     >
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        decelerationRate="normal"
+      >
         <Text style={[styles.title, { color: colors.text }]}>Registro de Jornada Operativa</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Ingrese las métricas observadas al cierre de turno</Text>
 

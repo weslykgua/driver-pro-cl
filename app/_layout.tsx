@@ -142,6 +142,28 @@ function MainApp() {
                 display: flex !important;
                 flex-direction: column !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+                scroll-behavior: smooth !important;
+                -webkit-overflow-scrolling: touch !important;
+              }
+
+              /* Custom Sleek Scrollbar */
+              ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+              }
+              ::-webkit-scrollbar-track {
+                background: ${colors.background};
+              }
+              ::-webkit-scrollbar-thumb {
+                background: ${colors.border};
+                border-radius: 999px;
+              }
+              ::-webkit-scrollbar-thumb:hover {
+                background: ${colors.textMuted};
+              }
+
+              * {
+                box-sizing: border-box;
               }
             `
           }} />

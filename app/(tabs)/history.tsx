@@ -11,6 +11,8 @@ import {
   Modal,
   TextInput,
   ScrollView,
+  LayoutAnimation,
+  UIManager,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
@@ -19,6 +21,10 @@ import { supabase } from '../../lib/supabase';
 import { DailyShift, ShiftInput } from '../../types/database';
 import { formatCLP, formatDateSpanish, formatHoursDecimal, calculateDailyMetrics } from '../../utils/calculations';
 import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 export default function HistoryScreen() {
   const { user } = useAuth();
@@ -73,7 +79,13 @@ export default function HistoryScreen() {
   );
 
   const toggleExpand = (id: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedId(expandedId === id ? null : id);
+  };
+
+  const handleSelectTab = (tab: 'active' | 'trash') => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setActiveTab(tab);
   };
 
   const handleMoveToTrash = async (shiftId: string) => {
@@ -209,10 +221,15 @@ export default function HistoryScreen() {
     }
   };
 
-  const exportToCSV = () => {
-    const activeShifts = shifts.filter((s) => !s.is_deleted);
+  const exportToExcel = () => {
+    // Strictly filter out any deleted/trash records
+    const activeShifts = shifts.filter(
+      (s) => s.is_deleted !== true && (s as any).is_deleted !== 'true' && (s as any).is_deleted !== 1
+    );
     if (activeShifts.length === 0) {
-      Alert.alert('Exportar', 'No hay registros activos para exportar');
+      const msg = 'No hay registros activos para exportar.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Exportar Excel', msg);
       return;
     }
 
@@ -222,7 +239,7 @@ export default function HistoryScreen() {
       'Horas Conectado',
       'Km Recorridos',
       'Consumo L/100km',
-      'Retencion SII CLP',
+      'Retención SII CLP',
       'Saldo App CLP',
       'Bencina Gastada CLP',
       'Bolsillo Neto CLP',
@@ -231,34 +248,88 @@ export default function HistoryScreen() {
       'Notas',
     ];
 
-    const rows = activeShifts.map((s: DailyShift) => [
-      s.shift_date,
-      s.gross_earnings,
-      s.hours,
-      s.distance_km,
-      s.fuel_consumption,
-      s.sii_tax_amount,
-      s.app_balance,
-      s.fuel_cost,
-      s.pocket_net,
-      s.pocket_net_per_hour,
-      s.pocket_net_per_km,
-      `"${(s.notes || '').replace(/"/g, '""')}"`,
-    ]);
+    const tableHeadersHtml = headers
+      .map(
+        (h) =>
+          `<th style="background-color:#151B23;color:#FFFFFF;font-weight:bold;border:1px solid #252D38;padding:8px 12px;text-align:left;">${h}</th>`
+      )
+      .join('');
 
-    const csvContent = [headers.join(','), ...rows.map((r: (string | number)[]) => r.join(','))].join('\n');
+    const tableRowsHtml = activeShifts
+      .map((s: DailyShift) => {
+        const cleanNotes = (s.notes || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<tr>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;">${s.shift_date}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.gross_earnings}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.hours}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.distance_km}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.fuel_consumption}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.sii_tax_amount}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.app_balance}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.fuel_cost}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;font-weight:bold;">${s.pocket_net}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.pocket_net_per_hour}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.pocket_net_per_km}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;">${cleanNotes}</td>
+        </tr>`;
+      })
+      .join('');
 
-    if (Platform.OS === 'web') {
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `historial_turnos_${new Date().toISOString().split('T')[0]}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    const excelTemplate = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+          <!--[if gte mso 9]>
+          <xml>
+            <x:ExcelWorkbook>
+              <x:ExcelWorksheets>
+                <x:ExcelWorksheet>
+                  <x:Name>Historial Turnos</x:Name>
+                  <x:WorksheetOptions>
+                    <x:DisplayGridlines/>
+                  </x:WorksheetOptions>
+                </x:ExcelWorksheet>
+              </x:ExcelWorksheets>
+            </x:ExcelWorkbook>
+          </xml>
+          <![endif]-->
+        </head>
+        <body style="font-family: Arial, sans-serif;">
+          <table>
+            <thead>
+              <tr>${tableHeadersHtml}</tr>
+            </thead>
+            <tbody>
+              ${tableRowsHtml}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    if (Platform.OS === 'web' || (typeof window !== 'undefined' && typeof document !== 'undefined')) {
+      try {
+        const blob = new Blob(['\uFEFF' + excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8' });
+        const fileName = `historial_turnos_${new Date().toISOString().split('T')[0]}.xls`;
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', fileName);
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, 300);
+      } catch (err) {
+        console.error('Error al descargar Excel:', err);
+        window.alert('No se pudo descargar el archivo Excel automáticamente.');
+      }
     } else {
-      Alert.alert('CSV Generado', 'Los datos están listos para ser exportados');
+      Alert.alert('Excel Generado', 'Los registros se han preparado para la exportación.');
     }
   };
 
@@ -273,9 +344,9 @@ export default function HistoryScreen() {
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{shifts.filter((s) => !s.is_deleted).length} registros activos</Text>
         </View>
 
-        <TouchableOpacity style={[styles.exportButton, { backgroundColor: colors.surface, borderColor: colors.borderDark }]} onPress={exportToCSV} activeOpacity={0.8}>
-          <Ionicons name="download-outline" size={15} color={colors.primary} />
-          <Text style={[styles.exportButtonText, { color: colors.primary }]}>Exportar CSV</Text>
+        <TouchableOpacity style={[styles.exportButton, { backgroundColor: colors.surface, borderColor: colors.borderDark }]} onPress={exportToExcel} activeOpacity={0.8}>
+          <Ionicons name="document-text-outline" size={15} color={colors.primary} />
+          <Text style={[styles.exportButtonText, { color: colors.primary }]}>Exportar Excel</Text>
         </TouchableOpacity>
       </View>
 
@@ -283,7 +354,7 @@ export default function HistoryScreen() {
       <View style={[styles.tabSelector, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <TouchableOpacity
           style={[styles.tabSelectorButton, activeTab === 'active' && [styles.tabSelectorActive, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]]}
-          onPress={() => setActiveTab('active')}
+          onPress={() => handleSelectTab('active')}
         >
           <Text style={[styles.tabSelectorText, { color: activeTab === 'active' ? colors.primary : colors.textMuted }]}>
             Registros Activos
@@ -292,7 +363,7 @@ export default function HistoryScreen() {
 
         <TouchableOpacity
           style={[styles.tabSelectorButton, activeTab === 'trash' && [styles.tabSelectorActiveTrash, { backgroundColor: colors.dangerSoft, borderColor: colors.danger + '33' }]]}
-          onPress={() => setActiveTab('trash')}
+          onPress={() => handleSelectTab('trash')}
         >
           <Ionicons name="trash-outline" size={14} color={activeTab === 'trash' ? colors.danger : colors.textMuted} style={{ marginRight: 4 }} />
           <Text style={[styles.tabSelectorText, { color: activeTab === 'trash' ? colors.danger : colors.textMuted }]}>
@@ -304,6 +375,9 @@ export default function HistoryScreen() {
       <FlatList
         data={displayedShifts}
         keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        decelerationRate="normal"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
