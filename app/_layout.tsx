@@ -105,11 +105,26 @@ export default function RootLayout() {
       }}
     >
       <View style={styles.container}>
+        {Platform.OS === 'web' && (
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              html, body, #root, [data-expo-root] {
+                height: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: #0B0F17 !important;
+                display: flex !important;
+                flex-direction: column !important;
+              }
+            `
+          }} />
+        )}
         <StatusBar style="light" />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: '#0B0F17' },
+            contentStyle: { backgroundColor: '#0B0F17', flex: 1 },
             animation: 'fade',
           }}
         >
@@ -126,11 +141,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
+    height: '100%',
     backgroundColor: '#0B0F17',
-    ...(Platform.OS === 'web'
-      ? {
-          minHeight: '100vh' as any,
-        }
-      : {}),
   },
 });
