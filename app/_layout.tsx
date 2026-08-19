@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, Platform, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
@@ -29,6 +29,7 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export default function RootLayout() {
+  const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +68,7 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
-    // Initial JWT session fetch
+    // Initial session fetch
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
       setSession(session);
       if (session?.user) {
@@ -76,7 +77,7 @@ export default function RootLayout() {
       setLoading(false);
     });
 
-    // JWT session change listener
+    // Session change listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event: string, session: Session | null) => {
         setSession(session);
@@ -97,14 +98,18 @@ export default function RootLayout() {
   const signOut = async () => {
     setLoading(true);
     try {
-      // Revoke JWT token session in Supabase & clear storage
       await supabase.auth.signOut();
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+      }
     } catch (e) {
       console.warn('SignOut exception:', e);
     } finally {
       setSession(null);
       setProfile(null);
       setLoading(false);
+      router.replace('/(auth)/login');
     }
   };
 

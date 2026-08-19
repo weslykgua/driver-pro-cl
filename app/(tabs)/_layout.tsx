@@ -2,7 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
+import { COLORS, RADIUS } from '../../constants/theme';
 
 export default function TabsLayout() {
   const { width } = useWindowDimensions();
@@ -20,14 +20,9 @@ export default function TabsLayout() {
                 <Ionicons name="bar-chart-outline" size={18} color={COLORS.primary} />
               </View>
               <View>
-                <Text style={styles.desktopBrandName}>Conductor Pro</Text>
+                <Text style={styles.desktopBrandName}>TripRate</Text>
                 <Text style={styles.desktopBrandSubtitle}>Gestión Financiera & Control Operativo</Text>
               </View>
-            </View>
-
-            <View style={styles.desktopSecurityBadge}>
-              <Ionicons name="shield-checkmark-outline" size={14} color={COLORS.success} />
-              <Text style={styles.desktopSecurityText}>Plataforma Segura</Text>
             </View>
           </View>
         )}
@@ -162,19 +157,5 @@ const styles = StyleSheet.create({
   desktopBrandSubtitle: {
     fontSize: 11,
     color: COLORS.textMuted,
-  },
-  desktopSecurityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.successSoft,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: RADIUS.sm,
-    gap: 6,
-  },
-  desktopSecurityText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: COLORS.success,
   },
 });

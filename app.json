@@ -1,31 +1,33 @@
 {
   "expo": {
-    "name": "Conductor Pro Chile",
-    "slug": "driver-pro-cl",
+    "name": "TripRate",
+    "slug": "triprate",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "conductor-pro",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#0B0F17"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.conductorpro.chile"
+      "supportsTablet": true
     },
     "android": {
-      "package": "com.conductorpro.chile"
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0F17"
+      }
     },
     "web": {
+      "favicon": "./assets/favicon.png",
       "bundler": "metro",
       "output": "single"
     },
     "plugins": [
       "expo-router"
     ],
-    "experiments": {
-      "typedRoutes": true
-    }
+    "scheme": "triprate"
   }
 }

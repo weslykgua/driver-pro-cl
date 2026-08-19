@@ -12,13 +12,6 @@ interface LiveSummaryCardProps {
 export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTaxRatePercentage }) => {
   return (
     <View style={styles.card}>
-      <View style={styles.headerRow}>
-        <View style={styles.badge}>
-          <View style={styles.statusDot} />
-          <Text style={styles.headerTitle}>RESUMEN EN TIEMPO REAL</Text>
-        </View>
-      </View>
-
       {/* Main Net Income */}
       <View style={styles.heroContainer}>
         <Text style={styles.heroLabel}>Líquido Neto Estimado en Bolsillo</Text>
@@ -80,31 +73,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     marginVertical: 14,
     ...SHADOWS.card,
-  },
-  headerRow: {
-    marginBottom: 12,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: COLORS.successSoft,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: RADIUS.sm,
-    gap: 6,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.success,
-  },
-  headerTitle: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLORS.success,
-    letterSpacing: 0.8,
   },
   heroContainer: {
     alignItems: 'center',

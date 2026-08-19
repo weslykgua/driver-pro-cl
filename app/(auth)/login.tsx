@@ -72,7 +72,7 @@ export default function LoginScreen() {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
-      const redirectUrl = Platform.OS === 'web' ? window.location.origin : 'conductor-pro://';
+      const redirectUrl = Platform.OS === 'web' ? window.location.origin : 'triprate://';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -101,9 +101,9 @@ export default function LoginScreen() {
           {/* Corporate Brand Header */}
           <View style={styles.brandContainer}>
             <View style={styles.logoBadge}>
-              <Ionicons name="shield-checkmark" size={28} color={COLORS.primary} />
+              <Ionicons name="bar-chart" size={28} color={COLORS.primary} />
             </View>
-            <Text style={styles.appName}>Conductor Pro</Text>
+            <Text style={styles.appName}>TripRate</Text>
             <Text style={styles.appTagline}>Gestión Financiera para Conductores</Text>
           </View>
 

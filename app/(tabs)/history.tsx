@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -30,7 +30,6 @@ export default function HistoryScreen() {
   // Edit Modal State
   const [editingShift, setEditingShift] = useState<DailyShift | null>(null);
   const [editGrossStr, setEditGrossStr] = useState('');
-  const [editCashStr, setEditCashStr] = useState('');
   const [editHoursStr, setEditHoursStr] = useState('');
   const [editKmStr, setEditKmStr] = useState('');
   const [editConsumptionStr, setEditConsumptionStr] = useState('');
@@ -137,7 +136,6 @@ export default function HistoryScreen() {
   const handleOpenEditModal = (shift: DailyShift) => {
     setEditingShift(shift);
     setEditGrossStr(shift.gross_earnings.toString());
-    setEditCashStr(shift.cash_collected.toString());
     setEditHoursStr(shift.hours.toString());
     setEditKmStr(shift.distance_km.toString());
     setEditConsumptionStr(shift.fuel_consumption.toString());
@@ -150,7 +148,6 @@ export default function HistoryScreen() {
     setSavingEdit(true);
     try {
       const gross = parseFloat(editGrossStr) || 0;
-      const cash = parseFloat(editCashStr) || 0;
       const hours = parseFloat(editHoursStr) || 0;
       const distanceKm = parseFloat(editKmStr) || 0;
       const fuelConsumption = parseFloat(editConsumptionStr) || 7.4;
@@ -158,7 +155,7 @@ export default function HistoryScreen() {
 
       const input: ShiftInput = {
         grossEarnings: gross,
-        cashCollected: cash,
+        cashCollected: 0,
         hours: Math.floor(hours),
         minutes: Math.round((hours - Math.floor(hours)) * 60),
         distanceKm,
@@ -171,7 +168,7 @@ export default function HistoryScreen() {
 
       const updatedShiftData = {
         gross_earnings: gross,
-        cash_collected: cash,
+        cash_collected: 0,
         hours: metrics.totalHours,
         distance_km: distanceKm,
         fuel_consumption: fuelConsumption,
@@ -221,7 +218,6 @@ export default function HistoryScreen() {
     const headers = [
       'Fecha',
       'Bruto CLP',
-      'Efectivo Cobrado',
       'Horas Conectado',
       'Km Recorridos',
       'Consumo L/100km',
@@ -237,7 +233,6 @@ export default function HistoryScreen() {
     const rows = activeShifts.map((s: DailyShift) => [
       s.shift_date,
       s.gross_earnings,
-      s.cash_collected,
       s.hours,
       s.distance_km,
       s.fuel_consumption,
@@ -365,11 +360,6 @@ export default function HistoryScreen() {
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Efectivo Cobrado en Mano:</Text>
-                      <Text style={styles.detailValue}>{formatCLP(item.cash_collected)}</Text>
-                    </View>
-
-                    <View style={styles.detailRow}>
                       <Text style={styles.detailLabel}>Saldo Plataforma Transferible:</Text>
                       <Text style={[styles.detailValue, { color: COLORS.secondary }]}>
                         {formatCLP(item.app_balance)}
@@ -486,16 +476,6 @@ export default function HistoryScreen() {
                   style={styles.modalInput}
                   value={editGrossStr}
                   onChangeText={setEditGrossStr}
-                  keyboardType="numeric"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Efectivo Cobrado en Mano ($ CLP)</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  value={editCashStr}
-                  onChangeText={setEditCashStr}
                   keyboardType="numeric"
                 />
               </View>

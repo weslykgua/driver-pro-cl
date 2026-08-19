@@ -30,9 +30,8 @@ export default function NewShiftScreen() {
   const [shiftDate, setShiftDate] = useState(getTodayString());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Clean empty defaults (no prefilled dummy numbers)
+  // Clean empty defaults
   const [grossEarningsStr, setGrossEarningsStr] = useState('');
-  const [cashCollectedStr, setCashCollectedStr] = useState('');
   const [hoursStr, setHoursStr] = useState('');
   const [minutesStr, setMinutesStr] = useState('');
   const [distanceKmStr, setDistanceKmStr] = useState('');
@@ -58,7 +57,7 @@ export default function NewShiftScreen() {
   const shiftInput: ShiftInput = useMemo(() => {
     return {
       grossEarnings: parseFloat(grossEarningsStr) || 0,
-      cashCollected: parseFloat(cashCollectedStr) || 0,
+      cashCollected: 0,
       hours: parseFloat(hoursStr) || 0,
       minutes: parseFloat(minutesStr) || 0,
       distanceKm: parseFloat(distanceKmStr) || 0,
@@ -68,7 +67,6 @@ export default function NewShiftScreen() {
     };
   }, [
     grossEarningsStr,
-    cashCollectedStr,
     hoursStr,
     minutesStr,
     distanceKmStr,
@@ -86,7 +84,7 @@ export default function NewShiftScreen() {
         user_id: user?.id || 'demo-user-id',
         shift_date: shiftDate,
         gross_earnings: shiftInput.grossEarnings,
-        cash_collected: shiftInput.cashCollected,
+        cash_collected: 0,
         hours: liveMetrics.totalHours,
         distance_km: shiftInput.distanceKm,
         fuel_consumption: shiftInput.fuelConsumption,
@@ -224,22 +222,6 @@ export default function NewShiftScreen() {
                 onChangeText={setGrossEarningsStr}
                 keyboardType="numeric"
                 placeholder="Ej: 75000"
-                placeholderTextColor={COLORS.textMuted}
-              />
-            </View>
-          </View>
-
-          {/* Cash Collected in Hand ($ CLP) */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Efectivo Recibido de Pasajeros ($ CLP)</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.currencySymbol}>$</Text>
-              <TextInput
-                style={styles.input}
-                value={cashCollectedStr}
-                onChangeText={setCashCollectedStr}
-                keyboardType="numeric"
-                placeholder="Ej: 15000"
                 placeholderTextColor={COLORS.textMuted}
               />
             </View>

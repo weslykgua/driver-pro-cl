@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -74,7 +74,6 @@ export default function DashboardScreen() {
   const totalPocketNet = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.pocket_net), 0);
   const totalFuelCost = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.fuel_cost), 0);
   const totalSiiTax = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.sii_tax_amount), 0);
-  const totalCashCollected = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.cash_collected), 0);
   const totalAppBalance = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.app_balance), 0);
   const totalHours = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.hours), 0);
   const totalKm = activeShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.distance_km), 0);
@@ -182,14 +181,6 @@ export default function DashboardScreen() {
 
         <View style={styles.twoColumnRow}>
           <MetricCard
-            title="Efectivo Cobrado"
-            value={formatCLP(totalCashCollected)}
-            subtitle="Cobrado en mano"
-            iconName="cash-outline"
-            variant="slate"
-            style={styles.halfCard}
-          />
-          <MetricCard
             title="Saldo App Transferible"
             value={formatCLP(totalAppBalance)}
             subtitle="Saldo en plataforma"
@@ -197,23 +188,12 @@ export default function DashboardScreen() {
             variant="blue"
             style={styles.halfCard}
           />
-        </View>
-
-        <View style={styles.twoColumnRow}>
           <MetricCard
             title="Promedio / Hora"
             value={`${formatCLP(avgNetPerHour)}/h`}
             subtitle={`${totalHours.toFixed(1)} hrs conectadas`}
             iconName="time-outline"
             variant="emerald"
-            style={styles.halfCard}
-          />
-          <MetricCard
-            title="Promedio / Km"
-            value={`${formatCLP(avgNetPerKm)}/km`}
-            subtitle={`${totalKm} km recorridos`}
-            iconName="navigate-outline"
-            variant="blue"
             style={styles.halfCard}
           />
         </View>
