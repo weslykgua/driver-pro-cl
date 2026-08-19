@@ -9,7 +9,7 @@ declare const process: {
   };
 };
 
-const DEFAULT_SUPABASE_URL = 'https://yryytrrrbfppigixtkc.supabase.co';
+const DEFAULT_SUPABASE_URL = 'https://yryytrrrbftppigixtkc.supabase.co';
 const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlyeXl0cnJyYmZ0cHBpZ2l4dGtjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxMDY5NjYsImV4cCI6MjEwMjY4Mjk2Nn0.6rfV5rySS99Zimlfda89Z6wziCGkR2eWh3mRfmQR5WY';
 
 const rawUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
