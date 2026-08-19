@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, RADIUS, SHADOWS } from '../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../constants/theme';
 
 interface MiniDatePickerProps {
   visible: boolean;
@@ -16,6 +16,7 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
   onSelectDate,
   onClose,
 }) => {
+  const { colors } = useTheme();
   const initialDate = selectedDate ? new Date(selectedDate + 'T12:00:00') : new Date();
   const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(initialDate.getMonth());
@@ -65,26 +66,29 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity style={styles.calendarCard} activeOpacity={1}>
+        <TouchableOpacity
+          style={[styles.calendarCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          activeOpacity={1}
+        >
           {/* Header Month / Year controls */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={handlePrevMonth} style={styles.arrowButton}>
-              <Ionicons name="chevron-back" size={18} color={COLORS.textSecondary} />
+            <TouchableOpacity onPress={handlePrevMonth} style={[styles.arrowButton, { backgroundColor: colors.neutralSoft }]}>
+              <Ionicons name="chevron-back" size={18} color={colors.textSecondary} />
             </TouchableOpacity>
 
-            <Text style={styles.monthYearText}>
+            <Text style={[styles.monthYearText, { color: colors.text }]}>
               {monthsEs[currentMonth]} {currentYear}
             </Text>
 
-            <TouchableOpacity onPress={handleNextMonth} style={styles.arrowButton}>
-              <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
+            <TouchableOpacity onPress={handleNextMonth} style={[styles.arrowButton, { backgroundColor: colors.neutralSoft }]}>
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           {/* Days of Week Header */}
           <View style={styles.daysOfWeekRow}>
             {daysOfWeek.map((day, index) => (
-              <Text key={index} style={styles.dayOfWeekText}>
+              <Text key={index} style={[styles.dayOfWeekText, { color: colors.textMuted }]}>
                 {day}
               </Text>
             ))}
@@ -107,8 +111,8 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
                   key={index}
                   style={[
                     styles.dayCell,
-                    isSelected && styles.dayCellSelected,
-                    isToday && !isSelected && styles.dayCellToday,
+                    isSelected && { backgroundColor: colors.primary },
+                    isToday && !isSelected && { borderWidth: 1, borderColor: colors.primary },
                   ]}
                   onPress={() => {
                     onSelectDate(formattedDate);
@@ -118,8 +122,9 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
                   <Text
                     style={[
                       styles.dayText,
+                      { color: colors.text },
                       isSelected && styles.dayTextSelected,
-                      isToday && !isSelected && styles.dayTextToday,
+                      isToday && !isSelected && { color: colors.primary, fontWeight: '700' },
                     ]}
                   >
                     {day}
@@ -131,14 +136,14 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
 
           {/* Footer Action */}
           <TouchableOpacity
-            style={styles.todayButton}
+            style={[styles.todayButton, { backgroundColor: colors.neutralSoft }]}
             onPress={() => {
               const today = new Date().toISOString().split('T')[0];
               onSelectDate(today);
               onClose();
             }}
           >
-            <Text style={styles.todayButtonText}>Seleccionar Hoy</Text>
+            <Text style={[styles.todayButtonText, { color: colors.primary }]}>Seleccionar Hoy</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </TouchableOpacity>
@@ -155,13 +160,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   calendarCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 20,
     width: '100%',
     maxWidth: 340,
     borderWidth: 1,
-    borderColor: COLORS.border,
     ...SHADOWS.card,
   },
   header: {
@@ -174,14 +177,12 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   monthYearText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
   },
   daysOfWeekRow: {
     flexDirection: 'row',
@@ -194,7 +195,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textMuted,
   },
   grid: {
     flexDirection: 'row',
@@ -212,35 +212,21 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm,
     marginVertical: 2,
   },
-  dayCellSelected: {
-    backgroundColor: COLORS.primary,
-  },
-  dayCellToday: {
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-  },
   dayText: {
     fontSize: 13,
     fontWeight: '500',
-    color: COLORS.text,
   },
   dayTextSelected: {
     color: '#FFFFFF',
     fontWeight: '700',
   },
-  dayTextToday: {
-    color: COLORS.primary,
-    fontWeight: '700',
-  },
   todayButton: {
     marginTop: 16,
-    backgroundColor: COLORS.neutralSoft,
     paddingVertical: 10,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
   },
   todayButtonText: {
-    color: COLORS.primary,
     fontSize: 13,
     fontWeight: '600',
   },

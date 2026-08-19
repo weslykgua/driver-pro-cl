@@ -2,15 +2,16 @@ import React, { useEffect } from 'react';
 import { Redirect } from 'expo-router';
 import { useAuth } from './_layout';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import { COLORS } from '../constants/theme';
+import { useTheme } from '../constants/theme';
 
 export default function RootIndex() {
   const { session, loading } = useAuth();
+  const { colors } = useTheme();
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -25,7 +26,6 @@ export default function RootIndex() {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: COLORS.background,
     justifyContent: 'center',
     alignItems: 'center',
   },

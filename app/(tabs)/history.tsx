@@ -18,10 +18,11 @@ import { useAuth } from '../_layout';
 import { supabase } from '../../lib/supabase';
 import { DailyShift, ShiftInput } from '../../types/database';
 import { formatCLP, formatDateSpanish, formatHoursDecimal, calculateDailyMetrics } from '../../utils/calculations';
-import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function HistoryScreen() {
   const { user } = useAuth();
+  const { colors } = useTheme();
   const [shifts, setShifts] = useState<DailyShift[]>([]);
   const [activeTab, setActiveTab] = useState<'active' | 'trash'>('active');
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -264,37 +265,37 @@ export default function HistoryScreen() {
   const trashCount = shifts.filter((s) => s.is_deleted).length;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header Bar */}
       <View style={styles.headerRow}>
         <View>
-          <Text style={styles.title}>Historial de Operaciones</Text>
-          <Text style={styles.subtitle}>{shifts.filter((s) => !s.is_deleted).length} registros activos</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Historial de Operaciones</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{shifts.filter((s) => !s.is_deleted).length} registros activos</Text>
         </View>
 
-        <TouchableOpacity style={styles.exportButton} onPress={exportToCSV} activeOpacity={0.8}>
-          <Ionicons name="download-outline" size={15} color={COLORS.primary} />
-          <Text style={styles.exportButtonText}>Exportar CSV</Text>
+        <TouchableOpacity style={[styles.exportButton, { backgroundColor: colors.surface, borderColor: colors.borderDark }]} onPress={exportToCSV} activeOpacity={0.8}>
+          <Ionicons name="download-outline" size={15} color={colors.primary} />
+          <Text style={[styles.exportButtonText, { color: colors.primary }]}>Exportar CSV</Text>
         </TouchableOpacity>
       </View>
 
       {/* Tabs: Active vs Papelera */}
-      <View style={styles.tabSelector}>
+      <View style={[styles.tabSelector, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.tabSelectorButton, activeTab === 'active' && styles.tabSelectorActive]}
+          style={[styles.tabSelectorButton, activeTab === 'active' && [styles.tabSelectorActive, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]]}
           onPress={() => setActiveTab('active')}
         >
-          <Text style={[styles.tabSelectorText, activeTab === 'active' && styles.tabSelectorTextActive]}>
+          <Text style={[styles.tabSelectorText, { color: activeTab === 'active' ? colors.primary : colors.textMuted }]}>
             Registros Activos
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tabSelectorButton, activeTab === 'trash' && styles.tabSelectorActiveTrash]}
+          style={[styles.tabSelectorButton, activeTab === 'trash' && [styles.tabSelectorActiveTrash, { backgroundColor: colors.dangerSoft, borderColor: colors.danger + '33' }]]}
           onPress={() => setActiveTab('trash')}
         >
-          <Ionicons name="trash-outline" size={14} color={activeTab === 'trash' ? COLORS.danger : COLORS.textMuted} style={{ marginRight: 4 }} />
-          <Text style={[styles.tabSelectorText, activeTab === 'trash' && styles.tabSelectorTextTrash]}>
+          <Ionicons name="trash-outline" size={14} color={activeTab === 'trash' ? colors.danger : colors.textMuted} style={{ marginRight: 4 }} />
+          <Text style={[styles.tabSelectorText, { color: activeTab === 'trash' ? colors.danger : colors.textMuted }]}>
             Papelera ({trashCount})
           </Text>
         </TouchableOpacity>
@@ -310,14 +311,14 @@ export default function HistoryScreen() {
               setRefreshing(true);
               fetchHistory();
             }}
-            tintColor={COLORS.primary}
+            tintColor={colors.primary}
           />
         }
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="document-text-outline" size={24} color={COLORS.textMuted} style={{ marginBottom: 6 }} />
-            <Text style={styles.emptyText}>
+            <Ionicons name="document-text-outline" size={24} color={colors.textMuted} style={{ marginBottom: 6 }} />
+            <Text style={[styles.emptyText, { color: colors.textMuted }]}>
               {activeTab === 'trash' ? 'La papelera está vacía.' : 'No hay turnos registrados en tu cuenta.'}
             </Text>
           </View>
@@ -325,86 +326,86 @@ export default function HistoryScreen() {
         renderItem={({ item }: { item: DailyShift }) => {
           const isExpanded = expandedId === item.id;
           return (
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <TouchableOpacity
                 style={styles.cardHeader}
                 onPress={() => toggleExpand(item.id)}
                 activeOpacity={0.8}
               >
                 <View style={styles.dateBlock}>
-                  <Text style={styles.dateText}>{formatDateSpanish(item.shift_date)}</Text>
-                  <Text style={styles.subDateText}>{item.shift_date}</Text>
+                  <Text style={[styles.dateText, { color: colors.text }]}>{formatDateSpanish(item.shift_date)}</Text>
+                  <Text style={[styles.subDateText, { color: colors.textMuted }]}>{item.shift_date}</Text>
                 </View>
 
                 <View style={styles.pocketBlock}>
-                  <Text style={styles.pocketNetValue}>{formatCLP(item.pocket_net)}</Text>
-                  <Text style={styles.pocketNetLabel}>Líquido Neto</Text>
+                  <Text style={[styles.pocketNetValue, { color: colors.success }]}>{formatCLP(item.pocket_net)}</Text>
+                  <Text style={[styles.pocketNetLabel, { color: colors.textMuted }]}>Líquido Neto</Text>
                 </View>
 
                 <Ionicons
                   name={isExpanded ? 'chevron-up' : 'chevron-down'}
                   size={18}
-                  color={COLORS.textMuted}
+                  color={colors.textMuted}
                 />
               </TouchableOpacity>
 
               {/* Collapsible Details */}
               {isExpanded && (
                 <View style={styles.expandedContent}>
-                  <View style={styles.divider} />
+                  <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
                   <View style={styles.detailsGrid}>
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Ganancia Bruta Plataforma:</Text>
-                      <Text style={styles.detailValue}>{formatCLP(item.gross_earnings)}</Text>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Ganancia Bruta Plataforma:</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{formatCLP(item.gross_earnings)}</Text>
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Saldo Plataforma Transferible:</Text>
-                      <Text style={[styles.detailValue, { color: COLORS.secondary }]}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Saldo Plataforma Transferible:</Text>
+                      <Text style={[styles.detailValue, { color: colors.secondary }]}>
                         {formatCLP(item.app_balance)}
                       </Text>
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Retención Legal SII (15.25%):</Text>
-                      <Text style={[styles.detailValue, { color: COLORS.warning }]}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Retención Legal SII (15.25%):</Text>
+                      <Text style={[styles.detailValue, { color: colors.warning }]}>
                         -{formatCLP(item.sii_tax_amount)}
                       </Text>
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Kilómetros Recorridos:</Text>
-                      <Text style={styles.detailValue}>{item.distance_km} km</Text>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Kilómetros Recorridos:</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{item.distance_km} km</Text>
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Consumo Promedio:</Text>
-                      <Text style={styles.detailValue}>{item.fuel_consumption} L/100km</Text>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Consumo Promedio:</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{item.fuel_consumption} L/100km</Text>
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Gasto Combustible ({item.fuel_liters} L):</Text>
-                      <Text style={[styles.detailValue, { color: COLORS.danger }]}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Gasto Combustible ({item.fuel_liters} L):</Text>
+                      <Text style={[styles.detailValue, { color: colors.danger }]}>
                         -{formatCLP(item.fuel_cost)}
                       </Text>
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Tiempo Conectado:</Text>
-                      <Text style={styles.detailValue}>{formatHoursDecimal(item.hours)}</Text>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Tiempo Conectado:</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{formatHoursDecimal(item.hours)}</Text>
                     </View>
 
                     <View style={styles.detailRow}>
-                      <Text style={styles.detailLabel}>Rendimiento Real:</Text>
-                      <Text style={[styles.detailValue, { color: COLORS.success }]}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Rendimiento Real:</Text>
+                      <Text style={[styles.detailValue, { color: colors.success }]}>
                         {formatCLP(item.pocket_net_per_hour)}/h | {formatCLP(item.pocket_net_per_km)}/km
                       </Text>
                     </View>
 
                     {item.notes ? (
-                      <View style={styles.notesBox}>
-                        <Text style={styles.notesText}>{item.notes}</Text>
+                      <View style={[styles.notesBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
+                        <Text style={[styles.notesText, { color: colors.textSecondary }]}>{item.notes}</Text>
                       </View>
                     ) : null}
                   </View>
@@ -414,37 +415,37 @@ export default function HistoryScreen() {
                     {activeTab === 'active' ? (
                       <>
                         <TouchableOpacity
-                          style={styles.editButton}
+                          style={[styles.editButton, { backgroundColor: colors.infoSoft, borderColor: colors.primary + '22' }]}
                           onPress={() => handleOpenEditModal(item)}
                         >
-                          <Ionicons name="create-outline" size={15} color={COLORS.primary} />
-                          <Text style={styles.editButtonText}>Modificar Día</Text>
+                          <Ionicons name="create-outline" size={15} color={colors.primary} />
+                          <Text style={[styles.editButtonText, { color: colors.primary }]}>Modificar Día</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={styles.trashButton}
+                          style={[styles.trashButton, { backgroundColor: colors.dangerSoft, borderColor: colors.danger + '22' }]}
                           onPress={() => handleMoveToTrash(item.id)}
                         >
-                          <Ionicons name="trash-outline" size={15} color={COLORS.danger} />
-                          <Text style={styles.trashButtonText}>Mover a Papelera</Text>
+                          <Ionicons name="trash-outline" size={15} color={colors.danger} />
+                          <Text style={[styles.trashButtonText, { color: colors.danger }]}>Mover a Papelera</Text>
                         </TouchableOpacity>
                       </>
                     ) : (
                       <>
                         <TouchableOpacity
-                          style={styles.restoreButton}
+                          style={[styles.restoreButton, { backgroundColor: colors.successSoft, borderColor: colors.success + '22' }]}
                           onPress={() => handleRestoreFromTrash(item.id)}
                         >
-                          <Ionicons name="refresh-outline" size={15} color={COLORS.success} />
-                          <Text style={styles.restoreButtonText}>Restaurar Turno</Text>
+                          <Ionicons name="refresh-outline" size={15} color={colors.success} />
+                          <Text style={[styles.restoreButtonText, { color: colors.success }]}>Restaurar Turno</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={styles.permanentDeleteButton}
+                          style={[styles.permanentDeleteButton, { backgroundColor: colors.dangerSoft, borderColor: colors.danger + '44' }]}
                           onPress={() => handlePermanentDelete(item.id)}
                         >
-                          <Ionicons name="close-circle-outline" size={15} color={COLORS.danger} />
-                          <Text style={styles.permanentDeleteButtonText}>Eliminar Definitivamente</Text>
+                          <Ionicons name="close-circle-outline" size={15} color={colors.danger} />
+                          <Text style={[styles.permanentDeleteButtonText, { color: colors.danger }]}>Eliminar Definitivamente</Text>
                         </TouchableOpacity>
                       </>
                     )}
@@ -459,82 +460,87 @@ export default function HistoryScreen() {
       {/* Edit Shift Modal */}
       <Modal visible={!!editingShift} transparent animationType="fade">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
                 Modificar Registro - {editingShift?.shift_date}
               </Text>
               <TouchableOpacity onPress={() => setEditingShift(null)}>
-                <Ionicons name="close" size={20} color={COLORS.textSecondary} />
+                <Ionicons name="close" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
             <ScrollView style={{ maxHeight: 380 }}>
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Ganancia Bruta Plataforma ($ CLP)</Text>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Ganancia Bruta Plataforma ($ CLP)</Text>
                 <TextInput
-                  style={styles.modalInput}
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
                   value={editGrossStr}
                   onChangeText={setEditGrossStr}
                   keyboardType="numeric"
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Horas Conectadas (Ej: 7.5)</Text>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Horas Conectadas (Ej: 7.5)</Text>
                 <TextInput
-                  style={styles.modalInput}
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
                   value={editHoursStr}
                   onChangeText={setEditHoursStr}
                   keyboardType="decimal-pad"
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Kilómetros Recorridos (km)</Text>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Kilómetros Recorridos (km)</Text>
                 <TextInput
-                  style={styles.modalInput}
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
                   value={editKmStr}
                   onChangeText={setEditKmStr}
                   keyboardType="decimal-pad"
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Consumo Promedio (L/100km)</Text>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Consumo Promedio (L/100km)</Text>
                 <TextInput
-                  style={styles.modalInput}
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
                   value={editConsumptionStr}
                   onChangeText={setEditConsumptionStr}
                   keyboardType="decimal-pad"
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.inputLabel}>Precio Combustible ($/Litro)</Text>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Precio Combustible ($/Litro)</Text>
                 <TextInput
-                  style={styles.modalInput}
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
                   value={editGasPriceStr}
                   onChangeText={setEditGasPriceStr}
                   keyboardType="numeric"
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
             </ScrollView>
 
             <View style={styles.modalActions}>
               <TouchableOpacity
-                style={styles.modalCancelButton}
+                style={[styles.modalCancelButton, { backgroundColor: colors.neutralSoft }]}
                 onPress={() => setEditingShift(null)}
               >
-                <Text style={styles.modalCancelText}>Cancelar</Text>
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Cancelar</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.modalSaveButton}
+                style={[styles.modalSaveButton, { backgroundColor: colors.primary }]}
                 onPress={handleSaveEdit}
                 disabled={savingEdit}
               >
-                <Text style={styles.modalSaveText}>
+                <Text style={[styles.modalSaveText, { color: colors.primaryText }]}>
                   {savingEdit ? 'Guardando...' : 'Guardar Cambios'}
                 </Text>
               </TouchableOpacity>
@@ -549,7 +555,6 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
     padding: 16,
   },
   headerRow: {
@@ -562,38 +567,31 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
     letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     marginTop: 2,
   },
   exportButton: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     gap: 6,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
   },
   exportButtonText: {
-    color: COLORS.primary,
     fontWeight: '600',
     fontSize: 12,
   },
   tabSelector: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.sm,
     padding: 3,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   tabSelectorButton: {
     flex: 1,
@@ -604,27 +602,14 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm - 2,
   },
   tabSelectorActive: {
-    backgroundColor: COLORS.neutralSoft,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
   },
   tabSelectorActiveTrash: {
-    backgroundColor: COLORS.dangerSoft,
     borderWidth: 1,
-    borderColor: COLORS.danger + '33',
   },
   tabSelectorText: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textMuted,
-  },
-  tabSelectorTextActive: {
-    color: COLORS.primary,
-    fontWeight: '700',
-  },
-  tabSelectorTextTrash: {
-    color: COLORS.danger,
-    fontWeight: '700',
   },
   listContent: {
     paddingBottom: 30,
@@ -635,14 +620,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    color: COLORS.textMuted,
     fontSize: 13,
   },
   card: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
     overflow: 'hidden',
     ...SHADOWS.card,
   },
@@ -658,11 +640,9 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
   },
   subDateText: {
     fontSize: 11,
-    color: COLORS.textMuted,
     marginTop: 2,
   },
   pocketBlock: {
@@ -672,11 +652,9 @@ const styles = StyleSheet.create({
   pocketNetValue: {
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.success,
   },
   pocketNetLabel: {
     fontSize: 10,
-    color: COLORS.textMuted,
     textTransform: 'uppercase',
   },
   expandedContent: {
@@ -685,7 +663,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
     marginBottom: 10,
   },
   detailsGrid: {
@@ -698,24 +675,19 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   detailValue: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.text,
   },
   notesBox: {
-    backgroundColor: COLORS.surfaceSubtle,
     padding: 8,
     borderRadius: RADIUS.sm,
     marginTop: 4,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   notesText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   actionsRow: {
     flexDirection: 'row',
@@ -727,15 +699,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: COLORS.infoSoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.primary + '22',
   },
   editButtonText: {
-    color: COLORS.primary,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -743,15 +712,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: COLORS.dangerSoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.danger + '22',
   },
   trashButtonText: {
-    color: COLORS.danger,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -759,15 +725,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: COLORS.successSoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.success + '22',
   },
   restoreButtonText: {
-    color: COLORS.success,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -775,15 +738,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: COLORS.dangerSoft,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.danger + '44',
   },
   permanentDeleteButtonText: {
-    color: COLORS.danger,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -795,13 +755,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 20,
     width: '100%',
     maxWidth: 440,
     borderWidth: 1,
-    borderColor: COLORS.border,
     ...SHADOWS.card,
   },
   modalHeader: {
@@ -813,23 +771,18 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: COLORS.text,
   },
   inputGroup: {
     marginBottom: 12,
   },
   inputLabel: {
     fontSize: 11,
-    color: COLORS.textSecondary,
     marginBottom: 4,
     fontWeight: '600',
   },
   modalInput: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
-    color: COLORS.text,
     paddingHorizontal: 12,
     height: 42,
     fontSize: 14,
@@ -844,10 +797,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.neutralSoft,
   },
   modalCancelText: {
-    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
   },
@@ -855,10 +806,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.primary,
   },
   modalSaveText: {
-    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '600',
   },
