@@ -5,7 +5,7 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
-import { COLORS } from '../constants/theme';
+import { ThemeProvider, useTheme, LIGHT_COLORS } from '../constants/theme';
 import { CookieConsentBanner } from '../components/CookieConsentBanner';
 
 interface AuthContextType {
@@ -28,8 +28,9 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-export default function RootLayout() {
+function MainApp() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -124,7 +125,7 @@ export default function RootLayout() {
         signOut,
       }}
     >
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         {Platform.OS === 'web' && (
           <style dangerouslySetInnerHTML={{
             __html: `
@@ -133,7 +134,7 @@ export default function RootLayout() {
                 width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                background-color: ${COLORS.background} !important;
+                background-color: ${colors.background} !important;
                 display: flex !important;
                 flex-direction: column !important;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
@@ -141,11 +142,11 @@ export default function RootLayout() {
             `
           }} />
         )}
-        <StatusBar style="dark" />
+        <StatusBar style={colors.isDark ? "light" : "dark"} />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: COLORS.background, flex: 1 },
+            contentStyle: { backgroundColor: colors.background, flex: 1 },
             animation: 'fade',
           }}
         >
@@ -160,11 +161,18 @@ export default function RootLayout() {
   );
 }
 
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
     height: '100%',
-    backgroundColor: COLORS.background,
   },
 });

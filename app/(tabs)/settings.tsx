@@ -14,11 +14,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../_layout';
 import { supabase } from '../../lib/supabase';
 import { formatCLP } from '../../utils/calculations';
-import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
+import { useTheme, RADIUS, SHADOWS, ThemeMode } from '../../constants/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, profile, refreshProfile, signOut } = useAuth();
+  const { colors, themeMode, setThemeMode } = useTheme();
 
   const [monthlyTargetStr, setMonthlyTargetStr] = useState('1300000');
   const [gasPriceStr, setGasPriceStr] = useState('1450');
@@ -80,99 +81,142 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Parámetros del Sistema</Text>
-      <Text style={styles.subtitle}>Configuración de variables financieras y tasas por defecto</Text>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.content}>
+      <Text style={[styles.title, { color: colors.text }]}>Parámetros del Sistema</Text>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Configuración de variables financieras, apariencia y tasas por defecto</Text>
 
       {/* User profile card */}
-      <View style={styles.profileCard}>
-        <View style={styles.avatarCircle}>
-          <Ionicons name="person-outline" size={18} color={COLORS.primary} />
+      <View style={[styles.profileCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.avatarCircle, { backgroundColor: colors.neutralSoft, borderColor: colors.border }]}>
+          <Ionicons name="person-outline" size={18} color={colors.primary} />
         </View>
         <View style={styles.profileInfo}>
-          <Text style={styles.userEmail}>{user?.email || 'Cuenta no autenticada'}</Text>
-          <Text style={styles.userStatus}>Sesión Activa</Text>
+          <Text style={[styles.userEmail, { color: colors.text }]}>{user?.email || 'Cuenta no autenticada'}</Text>
+          <Text style={[styles.userStatus, { color: colors.success }]}>Sesión Activa</Text>
+        </View>
+      </View>
+
+      {/* Theme Mode Selector Card */}
+      <View style={[styles.formCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Apariencia Visual (Modo Día / Noche)</Text>
+        
+        <View style={styles.themeOptionsRow}>
+          <TouchableOpacity
+            style={[
+              styles.themeOptionButton,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              themeMode === 'system' && { borderColor: colors.primary, backgroundColor: colors.neutralSoft }
+            ]}
+            onPress={() => setThemeMode('system')}
+          >
+            <Ionicons name="phone-portrait-outline" size={18} color={themeMode === 'system' ? colors.primary : colors.textMuted} />
+            <Text style={[styles.themeOptionText, { color: themeMode === 'system' ? colors.primary : colors.textSecondary }]}>Sistema</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.themeOptionButton,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              themeMode === 'light' && { borderColor: colors.primary, backgroundColor: colors.neutralSoft }
+            ]}
+            onPress={() => setThemeMode('light')}
+          >
+            <Ionicons name="sunny-outline" size={18} color={themeMode === 'light' ? colors.primary : colors.textMuted} />
+            <Text style={[styles.themeOptionText, { color: themeMode === 'light' ? colors.primary : colors.textSecondary }]}>Día</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.themeOptionButton,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              themeMode === 'dark' && { borderColor: colors.primary, backgroundColor: colors.neutralSoft }
+            ]}
+            onPress={() => setThemeMode('dark')}
+          >
+            <Ionicons name="moon-outline" size={18} color={themeMode === 'dark' ? colors.primary : colors.textMuted} />
+            <Text style={[styles.themeOptionText, { color: themeMode === 'dark' ? colors.primary : colors.textSecondary }]}>Noche</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
       {/* Settings Form */}
-      <View style={styles.formCard}>
-        <Text style={styles.sectionHeader}>Configuración Operativa de la Cuenta</Text>
+      <View style={[styles.formCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Configuración Operativa de la Cuenta</Text>
 
         {/* Monthly Target */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Meta Mensual Líquida ($ CLP)</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.currencySymbol}>$</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Meta Mensual Líquida ($ CLP)</Text>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+            <Text style={[styles.currencySymbol, { color: colors.primary }]}>$</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text }]}
               value={monthlyTargetStr}
               onChangeText={setMonthlyTargetStr}
               keyboardType="numeric"
               placeholder="1300000"
-              placeholderTextColor={COLORS.textMuted}
+              placeholderTextColor={colors.textMuted}
             />
           </View>
-          <Text style={styles.helperText}>
+          <Text style={[styles.helperText, { color: colors.textMuted }]}>
             Objetivo actual: {formatCLP(parseFloat(monthlyTargetStr) || 0)} líquidos en bolsillo
           </Text>
         </View>
 
         {/* Default Gas Price */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Precio Combustible Predeterminado ($/Litro)</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.currencySymbol}>$</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Precio Combustible Predeterminado ($/Litro)</Text>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+            <Text style={[styles.currencySymbol, { color: colors.primary }]}>$</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text }]}
               value={gasPriceStr}
               onChangeText={setGasPriceStr}
               keyboardType="numeric"
               placeholder="1450"
-              placeholderTextColor={COLORS.textMuted}
+              placeholderTextColor={colors.textMuted}
             />
-            <Text style={styles.unitSuffix}>/L</Text>
+            <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>/L</Text>
           </View>
         </View>
 
         {/* Default Consumption */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Consumo Promedio Vehículo (L/100km)</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="navigate-outline" size={16} color={COLORS.textMuted} style={styles.inputIcon} />
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Consumo Promedio Vehículo (L/100km)</Text>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+            <Ionicons name="navigate-outline" size={16} color={colors.textMuted} style={styles.inputIcon} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text }]}
               value={consumptionStr}
               onChangeText={setConsumptionStr}
               keyboardType="decimal-pad"
               placeholder="7.4"
-              placeholderTextColor={COLORS.textMuted}
+              placeholderTextColor={colors.textMuted}
             />
-            <Text style={styles.unitSuffix}>L/100km</Text>
+            <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>L/100km</Text>
           </View>
         </View>
 
         {/* SII Tax Rate */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Tasa de Retención SII (%)</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="receipt-outline" size={16} color={COLORS.textMuted} style={styles.inputIcon} />
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Tasa de Retención SII (%)</Text>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+            <Ionicons name="receipt-outline" size={16} color={colors.textMuted} style={styles.inputIcon} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: colors.text }]}
               value={taxRateStr}
               onChangeText={setTaxRateStr}
               keyboardType="decimal-pad"
               placeholder="15.25"
-              placeholderTextColor={COLORS.textMuted}
+              placeholderTextColor={colors.textMuted}
             />
-            <Text style={styles.unitSuffix}>%</Text>
+            <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>%</Text>
           </View>
-          <Text style={styles.helperText}>Tasa legal aplicada a servicios de transporte en Chile</Text>
+          <Text style={[styles.helperText, { color: colors.textMuted }]}>Tasa legal aplicada a servicios de transporte en Chile</Text>
         </View>
 
         {/* Save button */}
         <TouchableOpacity
-          style={styles.saveButton}
+          style={[styles.saveButton, { backgroundColor: colors.primary }]}
           onPress={handleSaveProfile}
           disabled={saving}
           activeOpacity={0.8}
@@ -186,9 +230,13 @@ export default function SettingsScreen() {
       </View>
 
       {/* Sign Out */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.8}>
-        <Ionicons name="log-out-outline" size={16} color={COLORS.danger} style={{ marginRight: 6 }} />
-        <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+      <TouchableOpacity
+        style={[styles.logoutButton, { backgroundColor: colors.surface, borderColor: colors.dangerSoft }]}
+        onPress={handleSignOut}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="log-out-outline" size={16} color={colors.danger} style={{ marginRight: 6 }} />
+        <Text style={[styles.logoutButtonText, { color: colors.danger }]}>Cerrar Sesión</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -197,7 +245,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   content: {
     padding: 16,
@@ -206,23 +253,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
     letterSpacing: -0.3,
     marginTop: 8,
   },
   subtitle: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     marginBottom: 16,
   },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 14,
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginBottom: 16,
     ...SHADOWS.card,
   },
@@ -230,12 +273,10 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   profileInfo: {
     flex: 1,
@@ -243,30 +284,43 @@ const styles = StyleSheet.create({
   userEmail: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.text,
   },
   userStatus: {
     fontSize: 11,
-    color: COLORS.success,
     marginTop: 2,
     fontWeight: '500',
   },
   formCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 18,
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginBottom: 16,
     ...SHADOWS.card,
   },
   sectionHeader: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 14,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
+  },
+  themeOptionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  themeOptionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    gap: 6,
+  },
+  themeOptionText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   inputGroup: {
     marginBottom: 14,
@@ -274,7 +328,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 6,
     textTransform: 'uppercase',
     letterSpacing: 0.3,
@@ -282,10 +335,8 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
     paddingHorizontal: 12,
     height: 44,
   },
@@ -293,30 +344,25 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   currencySymbol: {
-    color: COLORS.primary,
     fontWeight: '600',
     fontSize: 15,
     marginRight: 6,
   },
   unitSuffix: {
-    color: COLORS.textMuted,
     fontSize: 11,
     fontWeight: '500',
     marginLeft: 6,
   },
   input: {
     flex: 1,
-    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
   helperText: {
     fontSize: 11,
-    color: COLORS.textMuted,
     marginTop: 4,
   },
   saveButton: {
-    backgroundColor: COLORS.primary,
     height: 44,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
@@ -330,16 +376,13 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
     height: 44,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: COLORS.dangerSoft,
   },
   logoutButtonText: {
-    color: COLORS.danger,
     fontSize: 13,
     fontWeight: '600',
   },

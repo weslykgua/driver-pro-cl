@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SHADOWS, RADIUS } from '../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../constants/theme';
 
 interface MetricCardProps {
   title: string;
@@ -20,32 +20,38 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   variant = 'slate',
   style,
 }) => {
+  const { colors } = useTheme();
+
   const getVariantStyles = () => {
     switch (variant) {
       case 'emerald':
-        return { valueColor: COLORS.success, badgeBg: COLORS.successSoft, badgeText: COLORS.success };
+        return { valueColor: colors.success, badgeBg: colors.successSoft, badgeText: colors.success };
       case 'red':
-        return { valueColor: COLORS.danger, badgeBg: COLORS.dangerSoft, badgeText: COLORS.danger };
+        return { valueColor: colors.danger, badgeBg: colors.dangerSoft, badgeText: colors.danger };
       case 'amber':
-        return { valueColor: COLORS.warning, badgeBg: COLORS.warningSoft, badgeText: COLORS.warning };
+        return { valueColor: colors.warning, badgeBg: colors.warningSoft, badgeText: colors.warning };
       case 'blue':
-        return { valueColor: COLORS.primary, badgeBg: COLORS.infoSoft, badgeText: COLORS.primary };
+        return { valueColor: colors.primary, badgeBg: colors.infoSoft, badgeText: colors.primary };
       default:
-        return { valueColor: COLORS.text, badgeBg: COLORS.neutralSoft, badgeText: COLORS.textSecondary };
+        return { valueColor: colors.text, badgeBg: colors.neutralSoft, badgeText: colors.textSecondary };
     }
   };
 
   const vStyles = getVariantStyles();
 
   return (
-    <View style={[styles.card, style]}>
+    <View style={[
+      styles.card,
+      { backgroundColor: colors.surface, borderColor: colors.border },
+      style
+    ]}>
       <View style={styles.headerRow}>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={[styles.title, { color: colors.textSecondary }]} numberOfLines={1}>
           {title}
         </Text>
         {iconName && (
-          <View style={styles.iconWrapper}>
-            <Ionicons name={iconName} size={16} color={COLORS.textSecondary} />
+          <View style={[styles.iconWrapper, { backgroundColor: colors.neutralSoft }]}>
+            <Ionicons name={iconName} size={16} color={colors.textSecondary} />
           </View>
         )}
       </View>
@@ -54,7 +60,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       
       {subtitle && (
         <View style={styles.subtitleContainer}>
-          <Text style={styles.subtitleText}>{subtitle}</Text>
+          <Text style={[styles.subtitleText, { color: colors.textMuted }]}>{subtitle}</Text>
         </View>
       )}
     </View>
@@ -63,11 +69,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
     ...SHADOWS.card,
   },
   headerRow: {
@@ -79,7 +83,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
     flex: 1,
@@ -89,14 +92,12 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   value: {
     fontSize: 24,
     fontWeight: '700',
-    color: COLORS.text,
     letterSpacing: -0.5,
   },
   subtitleContainer: {
@@ -104,7 +105,6 @@ const styles = StyleSheet.create({
   },
   subtitleText: {
     fontSize: 12,
-    color: COLORS.textMuted,
     fontWeight: '400',
   },
 });

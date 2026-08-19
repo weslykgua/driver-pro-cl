@@ -19,11 +19,12 @@ import { LiveSummaryCard } from '../../components/LiveSummaryCard';
 import { MiniDatePicker } from '../../components/MiniDatePicker';
 import { calculateDailyMetrics } from '../../utils/calculations';
 import { ShiftInput } from '../../types/database';
-import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function NewShiftScreen() {
   const router = useRouter();
   const { user, profile } = useAuth();
+  const { colors } = useTheme();
 
   const getTodayString = () => new Date().toISOString().split('T')[0];
 
@@ -175,19 +176,19 @@ export default function NewShiftScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Registro de Jornada Operativa</Text>
-        <Text style={styles.subtitle}>Ingrese las métricas observadas al cierre de turno</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Registro de Jornada Operativa</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Ingrese las métricas observadas al cierre de turno</Text>
 
         {/* Visual Confirmation Banner upon saving */}
         {saveSuccess && (
-          <View style={styles.successCard}>
-            <Ionicons name="checkmark-circle" size={24} color={COLORS.success} />
+          <View style={[styles.successCard, { backgroundColor: colors.successSoft, borderColor: colors.success + '44' }]}>
+            <Ionicons name="checkmark-circle" size={24} color={colors.success} />
             <View>
-              <Text style={styles.successTitle}>¡Turno Guardado Correctamente!</Text>
-              <Text style={styles.successSubtext}>Actualizando métricas consolidadas...</Text>
+              <Text style={[styles.successTitle, { color: colors.success }]}>¡Turno Guardado Correctamente!</Text>
+              <Text style={[styles.successSubtext, { color: colors.textSecondary }]}>Actualizando métricas consolidadas...</Text>
             </View>
           </View>
         )}
@@ -196,139 +197,139 @@ export default function NewShiftScreen() {
         <LiveSummaryCard metrics={liveMetrics} siiTaxRatePercentage={siiTaxRate * 100} />
 
         {/* Form Controls */}
-        <View style={styles.formCard}>
+        <View style={[styles.formCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {/* Shift Date */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Fecha de Operación</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Fecha de Operación</Text>
             <TouchableOpacity
-              style={styles.inputWrapper}
+              style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}
               onPress={() => setShowDatePicker(true)}
               activeOpacity={0.8}
             >
-              <Ionicons name="calendar-outline" size={16} color={COLORS.primary} style={styles.inputIcon} />
-              <Text style={styles.dateDisplayText}>{shiftDate}</Text>
-              <Text style={styles.changeDateText}>Seleccionar</Text>
+              <Ionicons name="calendar-outline" size={16} color={colors.primary} style={styles.inputIcon} />
+              <Text style={[styles.dateDisplayText, { color: colors.text }]}>{shiftDate}</Text>
+              <Text style={[styles.changeDateText, { color: colors.primary }]}>Seleccionar</Text>
             </TouchableOpacity>
           </View>
 
           {/* Gross Earnings App ($ CLP) */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Ganancia Bruta en Plataforma ($ CLP)</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.currencySymbol}>$</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Ganancia Bruta en Plataforma ($ CLP)</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+              <Text style={[styles.currencySymbol, { color: colors.primary }]}>$</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 value={grossEarningsStr}
                 onChangeText={setGrossEarningsStr}
                 keyboardType="numeric"
                 placeholder="Ej: 75000"
-                placeholderTextColor={COLORS.textMuted}
+                placeholderTextColor={colors.textMuted}
               />
             </View>
           </View>
 
           {/* Connected Time */}
-          <Text style={styles.label}>Tiempo Conectado Total</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Tiempo Conectado Total</Text>
           <View style={styles.rowTwoInputs}>
             <View style={[styles.inputGroup, { flex: 1 }]}>
-              <View style={styles.inputWrapper}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   value={hoursStr}
                   onChangeText={setHoursStr}
                   keyboardType="numeric"
                   placeholder="Ej: 7"
-                  placeholderTextColor={COLORS.textMuted}
+                  placeholderTextColor={colors.textMuted}
                 />
-                <Text style={styles.unitSuffix}>Horas</Text>
+                <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>Horas</Text>
               </View>
             </View>
 
             <View style={[styles.inputGroup, { flex: 1 }]}>
-              <View style={styles.inputWrapper}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   value={minutesStr}
                   onChangeText={setMinutesStr}
                   keyboardType="numeric"
                   placeholder="Ej: 30"
-                  placeholderTextColor={COLORS.textMuted}
+                  placeholderTextColor={colors.textMuted}
                 />
-                <Text style={styles.unitSuffix}>Mins</Text>
+                <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>Mins</Text>
               </View>
             </View>
           </View>
 
           {/* Odometer Mileage (km) */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Kilometraje Recorrido (Odómetro)</Text>
-            <View style={styles.inputWrapper}>
-              <Ionicons name="navigate-outline" size={16} color={COLORS.textMuted} style={styles.inputIcon} />
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Kilometraje Recorrido (Odómetro)</Text>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+              <Ionicons name="navigate-outline" size={16} color={colors.textMuted} style={styles.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text }]}
                 value={distanceKmStr}
                 onChangeText={setDistanceKmStr}
                 keyboardType="decimal-pad"
                 placeholder="Ej: 175"
-                placeholderTextColor={COLORS.textMuted}
+                placeholderTextColor={colors.textMuted}
               />
-              <Text style={styles.unitSuffix}>km</Text>
+              <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>km</Text>
             </View>
           </View>
 
           {/* Fuel Consumption & Gas Price */}
           <View style={styles.rowTwoInputs}>
             <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Consumo Promedio</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Consumo Promedio</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   value={fuelConsumptionStr}
                   onChangeText={setFuelConsumptionStr}
                   keyboardType="decimal-pad"
                   placeholder="7.4"
-                  placeholderTextColor={COLORS.textMuted}
+                  placeholderTextColor={colors.textMuted}
                 />
-                <Text style={styles.unitSuffix}>L/100km</Text>
+                <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>L/100km</Text>
               </View>
             </View>
 
             <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Precio Combustible</Text>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.currencySymbol}>$</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Precio Combustible</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+                <Text style={[styles.currencySymbol, { color: colors.primary }]}>$</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   value={gasPriceStr}
                   onChangeText={setGasPriceStr}
                   keyboardType="numeric"
                   placeholder="1450"
-                  placeholderTextColor={COLORS.textMuted}
+                  placeholderTextColor={colors.textMuted}
                 />
-                <Text style={styles.unitSuffix}>/L</Text>
+                <Text style={[styles.unitSuffix, { color: colors.textMuted }]}>/L</Text>
               </View>
             </View>
           </View>
 
           {/* Optional Notes */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Observaciones Operativas</Text>
-            <View style={[styles.inputWrapper, { height: 60, alignItems: 'flex-start', paddingTop: 8 }]}>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Observaciones Operativas</Text>
+            <View style={[styles.inputWrapper, { height: 60, alignItems: 'flex-start', paddingTop: 8, backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
               <TextInput
-                style={[styles.input, { textAlignVertical: 'top' }]}
+                style={[styles.input, { textAlignVertical: 'top', color: colors.text }]}
                 value={notes}
                 onChangeText={setNotes}
                 multiline
                 numberOfLines={2}
                 placeholder="Notas opcionales de la jornada..."
-                placeholderTextColor={COLORS.textMuted}
+                placeholderTextColor={colors.textMuted}
               />
             </View>
           </View>
 
           {/* Save Button */}
           <TouchableOpacity
-            style={styles.saveButton}
+            style={[styles.saveButton, { backgroundColor: colors.primary }]}
             onPress={handleSaveShift}
             disabled={saving || saveSuccess}
             activeOpacity={0.8}
@@ -355,7 +356,6 @@ export default function NewShiftScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   content: {
     padding: 16,
@@ -364,41 +364,33 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
     letterSpacing: -0.3,
     marginTop: 8,
   },
   subtitle: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     marginBottom: 8,
   },
   successCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.successSoft,
     borderRadius: RADIUS.md,
     padding: 14,
     borderWidth: 1,
-    borderColor: COLORS.success + '44',
     gap: 12,
     marginVertical: 10,
   },
   successTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.success,
   },
   successSubtext: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   formCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 18,
     borderWidth: 1,
-    borderColor: COLORS.border,
     ...SHADOWS.card,
   },
   inputGroup: {
@@ -407,7 +399,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 6,
     textTransform: 'uppercase',
     letterSpacing: 0.3,
@@ -415,10 +406,8 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: COLORS.borderDark,
     paddingHorizontal: 12,
     height: 44,
   },
@@ -427,30 +416,25 @@ const styles = StyleSheet.create({
   },
   dateDisplayText: {
     flex: 1,
-    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
   changeDateText: {
-    color: COLORS.primary,
     fontSize: 12,
     fontWeight: '600',
   },
   currencySymbol: {
-    color: COLORS.primary,
     fontWeight: '600',
     fontSize: 15,
     marginRight: 6,
   },
   unitSuffix: {
-    color: COLORS.textMuted,
     fontSize: 11,
     fontWeight: '500',
     marginLeft: 6,
   },
   input: {
     flex: 1,
-    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -459,7 +443,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   saveButton: {
-    backgroundColor: COLORS.primary,
     height: 44,
     borderRadius: RADIUS.sm,
     alignItems: 'center',

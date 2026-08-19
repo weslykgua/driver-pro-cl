@@ -1,41 +1,63 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { View, Text, StyleSheet, Platform, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Platform, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, RADIUS } from '../../constants/theme';
+import { useTheme, RADIUS } from '../../constants/theme';
 
 export default function TabsLayout() {
   const { width } = useWindowDimensions();
+  const { colors, toggleTheme, themeMode } = useTheme();
+
   const isDesktop = Platform.OS === 'web' && width >= 768;
   const is4k = Platform.OS === 'web' && width >= 1800;
 
   return (
-    <View style={styles.webWrapper}>
-      <View style={[styles.webContainer, isDesktop && styles.desktopContainer, is4k && styles.container4k]}>
-        {/* Desktop Web Institutional Header */}
-        {isDesktop && (
-          <View style={styles.desktopHeader}>
-            <View style={styles.desktopBrand}>
-              <View style={styles.desktopLogoBadge}>
-                <Ionicons name="bar-chart-outline" size={18} color={COLORS.primary} />
-              </View>
-              <View>
-                <Text style={styles.desktopBrandName}>TripRate</Text>
-                <Text style={styles.desktopBrandSubtitle}>Gestión Financiera & Control Operativo</Text>
-              </View>
+    <View style={[styles.webWrapper, { backgroundColor: colors.background }]}>
+      <View style={[
+        styles.webContainer,
+        { backgroundColor: colors.background },
+        isDesktop && [styles.desktopContainer, { borderColor: colors.border, backgroundColor: colors.surface }],
+        is4k && styles.container4k
+      ]}>
+        {/* Header (Desktop or Mobile top bar for theme toggle) */}
+        <View style={[styles.headerBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <View style={styles.desktopBrand}>
+            <View style={[styles.desktopLogoBadge, { backgroundColor: colors.neutralSoft, borderColor: colors.border }]}>
+              <Ionicons name="bar-chart-outline" size={18} color={colors.primary} />
+            </View>
+            <View>
+              <Text style={[styles.desktopBrandName, { color: colors.primary }]}>TripRate</Text>
+              <Text style={[styles.desktopBrandSubtitle, { color: colors.textMuted }]}>Gestión Financiera & Control Operativo</Text>
             </View>
           </View>
-        )}
+
+          {/* Theme Toggle Button (Day / Night Mode) */}
+          <TouchableOpacity
+            style={[styles.themeToggleButton, { backgroundColor: colors.neutralSoft, borderColor: colors.border }]}
+            onPress={toggleTheme}
+            activeOpacity={0.8}
+            aria-label="Cambiar tema día/noche"
+          >
+            <Ionicons
+              name={colors.isDark ? 'sunny-outline' : 'moon-outline'}
+              size={18}
+              color={colors.isDark ? '#F59E0B' : colors.primary}
+            />
+            <Text style={[styles.themeToggleText, { color: colors.textSecondary }]}>
+              {colors.isDark ? 'Día' : 'Noche'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.tabsContainer}>
           <Tabs
             screenOptions={{
               headerShown: false,
-              tabBarActiveTintColor: COLORS.primary,
-              tabBarInactiveTintColor: COLORS.textMuted,
+              tabBarActiveTintColor: colors.primary,
+              tabBarInactiveTintColor: colors.textMuted,
               tabBarStyle: {
-                backgroundColor: COLORS.surface,
-                borderTopColor: COLORS.border,
+                backgroundColor: colors.surface,
+                borderTopColor: colors.border,
                 borderTopWidth: 1,
                 height: isDesktop ? 60 : Platform.OS === 'ios' ? 84 : 60,
                 paddingBottom: isDesktop ? 8 : Platform.OS === 'ios' ? 24 : 8,
@@ -98,7 +120,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    backgroundColor: COLORS.background,
     alignItems: 'center',
   },
   webContainer: {
@@ -106,56 +127,60 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     maxWidth: 780,
-    backgroundColor: COLORS.background,
   },
   desktopContainer: {
     maxWidth: 980,
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.surface,
   },
   container4k: {
-    maxWidth: 1200,
+    maxWidth: 1280,
   },
   tabsContainer: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
-  desktopHeader: {
+  headerBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: COLORS.surface,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   desktopBrand: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
   desktopLogoBadge: {
     width: 34,
     height: 34,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   desktopBrandName: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.primary,
     letterSpacing: -0.3,
   },
   desktopBrandSubtitle: {
     fontSize: 11,
-    color: COLORS.textMuted,
+  },
+  themeToggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    gap: 6,
+  },
+  themeToggleText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

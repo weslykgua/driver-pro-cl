@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { CalculatedMetrics } from '../types/database';
 import { formatCLP } from '../utils/calculations';
-import { COLORS, SHADOWS, RADIUS } from '../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../constants/theme';
 
 interface LiveSummaryCardProps {
   metrics: CalculatedMetrics;
@@ -10,54 +10,56 @@ interface LiveSummaryCardProps {
 }
 
 export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTaxRatePercentage }) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       {/* Main Net Income */}
       <View style={styles.heroContainer}>
-        <Text style={styles.heroLabel}>Líquido Neto Estimado en Bolsillo</Text>
-        <Text style={styles.heroValue}>{formatCLP(metrics.pocketNet)}</Text>
-        <Text style={styles.heroSubtext}>Monto disponible tras retención legal SII y gasto estimado de combustible</Text>
+        <Text style={[styles.heroLabel, { color: colors.textSecondary }]}>Líquido Neto Estimado en Bolsillo</Text>
+        <Text style={[styles.heroValue, { color: colors.success }]}>{formatCLP(metrics.pocketNet)}</Text>
+        <Text style={[styles.heroSubtext, { color: colors.textMuted }]}>Monto disponible tras retención legal SII y gasto estimado de combustible</Text>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* Breakdown Items */}
       <View style={styles.gridContainer}>
         <View style={styles.gridRow}>
-          <Text style={styles.rowLabel}>Saldo App Transferible</Text>
-          <Text style={[styles.rowValue, { color: metrics.appBalance >= 0 ? COLORS.secondary : COLORS.danger }]}>
+          <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>Saldo App Transferible</Text>
+          <Text style={[styles.rowValue, { color: metrics.appBalance >= 0 ? colors.secondary : colors.danger }]}>
             {formatCLP(metrics.appBalance)}
           </Text>
         </View>
 
         <View style={styles.gridRow}>
-          <Text style={styles.rowLabel}>Combustible Estimado ({metrics.fuelLiters} L)</Text>
-          <Text style={[styles.rowValue, { color: COLORS.danger }]}>-{formatCLP(metrics.fuelCost)}</Text>
+          <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>Combustible Estimado ({metrics.fuelLiters} L)</Text>
+          <Text style={[styles.rowValue, { color: colors.danger }]}>-{formatCLP(metrics.fuelCost)}</Text>
         </View>
 
         <View style={styles.gridRow}>
-          <Text style={styles.rowLabel}>Retención Legal SII ({siiTaxRatePercentage.toFixed(2)}%)</Text>
-          <Text style={[styles.rowValue, { color: COLORS.warning }]}>-{formatCLP(metrics.siiTaxAmount)}</Text>
+          <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>Retención Legal SII ({siiTaxRatePercentage.toFixed(2)}%)</Text>
+          <Text style={[styles.rowValue, { color: colors.warning }]}>-{formatCLP(metrics.siiTaxAmount)}</Text>
         </View>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* Performance KPIs */}
       <View style={styles.kpiRow}>
-        <View style={styles.kpiBox}>
-          <Text style={styles.kpiLabel}>Rendimiento / Hora</Text>
-          <Text style={styles.kpiValue}>{formatCLP(metrics.pocketNetPerHour)}/h</Text>
+        <View style={[styles.kpiBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
+          <Text style={[styles.kpiLabel, { color: colors.textMuted }]}>Rendimiento / Hora</Text>
+          <Text style={[styles.kpiValue, { color: colors.text }]}>{formatCLP(metrics.pocketNetPerHour)}/h</Text>
         </View>
 
-        <View style={styles.kpiBox}>
-          <Text style={styles.kpiLabel}>Rendimiento / Km</Text>
-          <Text style={styles.kpiValue}>{formatCLP(metrics.pocketNetPerKm)}/km</Text>
+        <View style={[styles.kpiBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
+          <Text style={[styles.kpiLabel, { color: colors.textMuted }]}>Rendimiento / Km</Text>
+          <Text style={[styles.kpiValue, { color: colors.text }]}>{formatCLP(metrics.pocketNetPerKm)}/km</Text>
         </View>
 
-        <View style={styles.kpiBox}>
-          <Text style={styles.kpiLabel}>Velocidad Promedio</Text>
-          <Text style={styles.kpiValue}>{metrics.avgSpeedKmh} km/h</Text>
+        <View style={[styles.kpiBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
+          <Text style={[styles.kpiLabel, { color: colors.textMuted }]}>Velocidad Promedio</Text>
+          <Text style={[styles.kpiValue, { color: colors.text }]}>{metrics.avgSpeedKmh} km/h</Text>
         </View>
       </View>
     </View>
@@ -66,11 +68,9 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 20,
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginVertical: 14,
     ...SHADOWS.card,
   },
@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   heroLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
@@ -89,18 +88,15 @@ const styles = StyleSheet.create({
   heroValue: {
     fontSize: 32,
     fontWeight: '700',
-    color: COLORS.success,
     letterSpacing: -0.5,
   },
   heroSubtext: {
     fontSize: 11,
-    color: COLORS.textMuted,
     marginTop: 4,
     textAlign: 'center',
   },
   divider: {
     height: 1,
-    backgroundColor: COLORS.border,
     marginVertical: 14,
   },
   gridContainer: {
@@ -113,7 +109,6 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     fontSize: 13,
-    color: COLORS.textSecondary,
     fontWeight: '500',
   },
   rowValue: {
@@ -126,17 +121,14 @@ const styles = StyleSheet.create({
   },
   kpiBox: {
     flex: 1,
-    backgroundColor: COLORS.surfaceSubtle,
     borderRadius: RADIUS.sm,
     paddingVertical: 10,
     paddingHorizontal: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   kpiLabel: {
     fontSize: 10,
-    color: COLORS.textMuted,
     fontWeight: '600',
     textTransform: 'uppercase',
     marginBottom: 4,
@@ -144,7 +136,6 @@ const styles = StyleSheet.create({
   },
   kpiValue: {
     fontSize: 13,
-    color: COLORS.text,
     fontWeight: '700',
   },
 });

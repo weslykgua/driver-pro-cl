@@ -15,11 +15,13 @@ import { DailyShift } from '../../types/database';
 import { MetricCard } from '../../components/MetricCard';
 import { ProgressBar } from '../../components/ProgressBar';
 import { formatCLP } from '../../utils/calculations';
-import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { user, profile } = useAuth();
+  const { colors } = useTheme();
+
   const [shifts, setShifts] = useState<DailyShift[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -88,23 +90,23 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
     >
       {/* Header Bar */}
       <View style={styles.headerRow}>
         <View>
-          <Text style={styles.welcomeText}>Resumen Consolidado</Text>
-          <Text style={styles.dateBadgeText}>
+          <Text style={[styles.welcomeText, { color: colors.text }]}>Resumen Consolidado</Text>
+          <Text style={[styles.dateBadgeText, { color: colors.textSecondary }]}>
             {new Date().toLocaleDateString('es-CL', { month: 'long', year: 'numeric' })}
           </Text>
         </View>
 
         <TouchableOpacity
-          style={styles.newShiftButton}
+          style={[styles.newShiftButton, { backgroundColor: colors.primary }]}
           onPress={() => router.push('/(tabs)/new-shift')}
           activeOpacity={0.8}
         >
@@ -118,28 +120,28 @@ export default function DashboardScreen() {
 
       {/* Empty State Banner if no shifts */}
       {activeShifts.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <Ionicons name="document-text-outline" size={24} color={COLORS.textMuted} style={{ marginBottom: 8 }} />
-          <Text style={styles.emptyTitle}>Sin turnos registrados este mes</Text>
-          <Text style={styles.emptySubtext}>
+        <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Ionicons name="document-text-outline" size={24} color={colors.textMuted} style={{ marginBottom: 8 }} />
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>Sin turnos registrados este mes</Text>
+          <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
             Presione el botón "Registrar Turno" arriba para ingresar su primera jornada del mes.
           </Text>
         </View>
       ) : (
         /* Corporate Pace Calculator */
-        <View style={styles.paceCard}>
+        <View style={[styles.paceCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.paceHeaderRow}>
-            <Ionicons name="calculator-outline" size={16} color={COLORS.primary} />
-            <Text style={styles.paceTitle}>Proyección Operativa</Text>
+            <Ionicons name="calculator-outline" size={16} color={colors.primary} />
+            <Text style={[styles.paceTitle, { color: colors.primary }]}>Proyección Operativa</Text>
           </View>
 
           {remainingPocket > 0 ? (
-            <Text style={styles.paceBodyText}>
-              A una tasa promedio de <Text style={styles.paceHighlight}>{formatCLP(avgNetPerHour)}/h</Text>, se requieren aproximadamente{' '}
-              <Text style={styles.paceHighlight}>{hoursNeeded} horas</Text> (~{daysNeeded} jornadas) para alcanzar el objetivo mensual.
+            <Text style={[styles.paceBodyText, { color: colors.textSecondary }]}>
+              A una tasa promedio de <Text style={[styles.paceHighlight, { color: colors.text }]}>{formatCLP(avgNetPerHour)}/h</Text>, se requieren aproximadamente{' '}
+              <Text style={[styles.paceHighlight, { color: colors.text }]}>{hoursNeeded} horas</Text> (~{daysNeeded} jornadas) para alcanzar el objetivo mensual.
             </Text>
           ) : (
-            <Text style={styles.paceBodyTextSuccess}>
+            <Text style={[styles.paceBodyTextSuccess, { color: colors.success }]}>
               Meta de {formatCLP(monthlyTarget)} alcanzada. Los ingresos adicionales constituyen excedente neto.
             </Text>
           )}
@@ -147,7 +149,7 @@ export default function DashboardScreen() {
       )}
 
       {/* Main KPI Cards Grid */}
-      <Text style={styles.sectionTitle}>Métricas Financieras del Período</Text>
+      <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Métricas Financieras del Período</Text>
 
       <View style={styles.gridContainer}>
         {/* Total Pocket Net */}
@@ -205,7 +207,6 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   content: {
     padding: 16,
@@ -221,18 +222,15 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 20,
     fontWeight: '700',
-    color: COLORS.text,
     letterSpacing: -0.3,
   },
   dateBadgeText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     textTransform: 'capitalize',
     marginTop: 2,
   },
   newShiftButton: {
     flexDirection: 'row',
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: RADIUS.sm,
@@ -245,32 +243,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   emptyCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginBottom: 16,
     ...SHADOWS.card,
   },
   emptyTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.text,
   },
   emptySubtext: {
     fontSize: 12,
-    color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: 4,
   },
   paceCard: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginBottom: 16,
     ...SHADOWS.card,
   },
@@ -283,29 +275,24 @@ const styles = StyleSheet.create({
   paceTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
   paceBodyText: {
     fontSize: 13,
-    color: COLORS.textSecondary,
     lineHeight: 20,
   },
   paceBodyTextSuccess: {
     fontSize: 13,
-    color: COLORS.success,
     lineHeight: 20,
     fontWeight: '600',
   },
   paceHighlight: {
-    color: COLORS.text,
     fontWeight: '600',
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     marginTop: 8,
     marginBottom: 12,
     textTransform: 'uppercase',

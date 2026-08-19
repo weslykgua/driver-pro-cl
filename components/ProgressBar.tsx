@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { formatCLP } from '../utils/calculations';
-import { COLORS, SHADOWS, RADIUS } from '../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../constants/theme';
 
 interface ProgressBarProps {
   current: number;
@@ -10,27 +10,28 @@ interface ProgressBarProps {
 }
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label = 'Meta Mensual Líquida' }) => {
+  const { colors } = useTheme();
   const percentage = target > 0 ? Math.min(Math.round((current / target) * 100), 100) : 0;
   const remaining = Math.max(0, target - current);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>{label}</Text>
-        <Text style={styles.percentageText}>{percentage}%</Text>
+        <Text style={[styles.title, { color: colors.textSecondary }]}>{label}</Text>
+        <Text style={[styles.percentageText, { color: colors.primary }]}>{percentage}%</Text>
       </View>
 
       {/* Progress Track */}
-      <View style={styles.track}>
-        <View style={[styles.fill, { width: `${percentage}%` }]} />
+      <View style={[styles.track, { backgroundColor: colors.neutralSoft }]}>
+        <View style={[styles.fill, { width: `${percentage}%`, backgroundColor: colors.primary }]} />
       </View>
 
       {/* Bottom Details */}
       <View style={styles.footer}>
-        <Text style={styles.currentText}>
-          Acumulado: <Text style={styles.highlight}>{formatCLP(current)}</Text>
+        <Text style={[styles.currentText, { color: colors.textSecondary }]}>
+          Acumulado: <Text style={[styles.highlight, { color: colors.text }]}>{formatCLP(current)}</Text>
         </Text>
-        <Text style={styles.remainingText}>
+        <Text style={[styles.remainingText, { color: colors.secondary }]}>
           {remaining > 0 ? `Restante: ${formatCLP(remaining)}` : 'Meta Cumplida'}
         </Text>
       </View>
@@ -40,11 +41,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
     marginVertical: 12,
     ...SHADOWS.card,
   },
@@ -57,24 +56,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
   percentageText: {
     fontSize: 14,
     fontWeight: '700',
-    color: COLORS.primary,
   },
   track: {
     height: 8,
-    backgroundColor: COLORS.neutralSoft,
     borderRadius: RADIUS.full,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
     borderRadius: RADIUS.full,
   },
   footer: {
@@ -84,15 +79,12 @@ const styles = StyleSheet.create({
   },
   currentText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   highlight: {
-    color: COLORS.text,
     fontWeight: '600',
   },
   remainingText: {
     fontSize: 12,
-    color: COLORS.secondary,
     fontWeight: '600',
   },
 });
