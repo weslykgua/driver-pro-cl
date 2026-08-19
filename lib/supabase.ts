@@ -9,8 +9,25 @@ declare const process: {
   };
 };
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://demo-supabase-url.supabase.co';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'demo-anon-key-placeholder';
+const rawUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
+const rawKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+
+const formatValidSupabaseUrl = (urlInput: string): string => {
+  if (!urlInput || typeof urlInput !== 'string') {
+    return 'https://demo-supabase-url.supabase.co';
+  }
+  const trimmed = urlInput.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  if (/^[a-z0-9]+$/i.test(trimmed)) {
+    return `https://${trimmed}.supabase.co`;
+  }
+  return 'https://demo-supabase-url.supabase.co';
+};
+
+const supabaseUrl = formatValidSupabaseUrl(rawUrl);
+const supabaseAnonKey = rawKey && rawKey.trim().length > 10 ? rawKey.trim() : 'demo-anon-key-placeholder';
 
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {
