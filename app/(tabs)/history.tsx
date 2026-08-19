@@ -21,6 +21,7 @@ import { supabase } from '../../lib/supabase';
 import { DailyShift, ShiftInput } from '../../types/database';
 import { formatCLP, formatDateSpanish, formatHoursDecimal, calculateDailyMetrics } from '../../utils/calculations';
 import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
+import { MiniDatePicker } from '../../components/MiniDatePicker';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -36,11 +37,14 @@ export default function HistoryScreen() {
 
   // Edit Modal State
   const [editingShift, setEditingShift] = useState<DailyShift | null>(null);
+  const [editDateStr, setEditDateStr] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [editGrossStr, setEditGrossStr] = useState('');
   const [editHoursStr, setEditHoursStr] = useState('');
   const [editKmStr, setEditKmStr] = useState('');
   const [editConsumptionStr, setEditConsumptionStr] = useState('');
   const [editGasPriceStr, setEditGasPriceStr] = useState('');
+  const [editNotesStr, setEditNotesStr] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchHistory = useCallback(async () => {
@@ -176,15 +180,24 @@ export default function HistoryScreen() {
 
   const handleOpenEditModal = (shift: DailyShift) => {
     setEditingShift(shift);
+    setEditDateStr(shift.shift_date);
     setEditGrossStr(shift.gross_earnings.toString());
     setEditHoursStr(shift.hours.toString());
     setEditKmStr(shift.distance_km.toString());
     setEditConsumptionStr(shift.fuel_consumption.toString());
     setEditGasPriceStr(shift.gas_price_per_liter.toString());
+    setEditNotesStr(shift.notes || '');
   };
 
   const handleSaveEdit = async () => {
     if (!editingShift) return;
+
+    if (!editDateStr || !/^\d{4}-\d{2}-\d{2}$/.test(editDateStr.trim())) {
+      const msg = 'Por favor ingresa una fecha válida en formato AAAA-MM-DD.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Fecha Inválida', msg);
+      return;
+    }
 
     setSavingEdit(true);
     try {
@@ -193,6 +206,7 @@ export default function HistoryScreen() {
       const distanceKm = parseFloat(editKmStr) || 0;
       const fuelConsumption = parseFloat(editConsumptionStr) || 7.4;
       const gasPrice = parseFloat(editGasPriceStr) || 1450;
+      const newShiftDate = editDateStr.trim();
 
       const input: ShiftInput = {
         grossEarnings: gross,
@@ -208,6 +222,7 @@ export default function HistoryScreen() {
       const metrics = calculateDailyMetrics(input);
 
       const updatedShiftData = {
+        shift_date: newShiftDate,
         gross_earnings: gross,
         cash_collected: 0,
         hours: metrics.totalHours,
@@ -223,6 +238,7 @@ export default function HistoryScreen() {
         pocket_net_per_hour: metrics.pocketNetPerHour,
         pocket_net_per_km: metrics.pocketNetPerKm,
         avg_speed_kmh: metrics.avgSpeedKmh,
+        notes: editNotesStr.trim(),
       };
 
       if (user) {
@@ -234,6 +250,7 @@ export default function HistoryScreen() {
         if (error) throw error;
       }
 
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setShifts((prev: DailyShift[]) =>
         prev.map((s: DailyShift) =>
           s.id === editingShift.id ? { ...s, ...updatedShiftData } : s
@@ -241,9 +258,13 @@ export default function HistoryScreen() {
       );
 
       setEditingShift(null);
-      Alert.alert('Actualización Exitosa', 'Los registros se han actualizado correctamente.');
+      const msg = 'Los registros se han actualizado correctamente.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Actualización Exitosa', msg);
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'No se pudo guardar la modificación.');
+      const msg = e.message || 'No se pudo guardar la modificación.';
+      if (Platform.OS === 'web' && typeof window !== 'undefined') window.alert(msg);
+      else Alert.alert('Error', msg);
     } finally {
       setSavingEdit(false);
     }
@@ -565,14 +586,34 @@ export default function HistoryScreen() {
           <View style={[styles.modalContent, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>
-                Modificar Registro - {editingShift?.shift_date}
+                Modificar Registro - {editDateStr}
               </Text>
               <TouchableOpacity onPress={() => setEditingShift(null)}>
                 <Ionicons name="close" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
-            <ScrollView style={{ maxHeight: 380 }}>
+            <ScrollView style={{ maxHeight: 420 }}>
+              {/* Shift Date Field + Calendar Trigger */}
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Fecha del Turno (AAAA-MM-DD)</Text>
+                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                  <TextInput
+                    style={[styles.modalInput, { flex: 1, backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
+                    value={editDateStr}
+                    onChangeText={setEditDateStr}
+                    placeholder="AAAA-MM-DD"
+                    placeholderTextColor={colors.textMuted}
+                  />
+                  <TouchableOpacity
+                    style={{ backgroundColor: colors.neutralSoft, paddingHorizontal: 12, height: 42, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: colors.borderDark, justifyContent: 'center', alignItems: 'center' }}
+                    onPress={() => setShowDatePicker(true)}
+                  >
+                    <Ionicons name="calendar-outline" size={18} color={colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
               <View style={styles.inputGroup}>
                 <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Ganancia Bruta Plataforma ($ CLP)</Text>
                 <TextInput
@@ -627,6 +668,18 @@ export default function HistoryScreen() {
                   placeholderTextColor={colors.textMuted}
                 />
               </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Notas / Observaciones del Día</Text>
+                <TextInput
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text, height: 'auto', minHeight: 42, paddingVertical: 8 }]}
+                  value={editNotesStr}
+                  onChangeText={setEditNotesStr}
+                  placeholder="Detalles adicionales..."
+                  placeholderTextColor={colors.textMuted}
+                  multiline
+                />
+              </View>
             </ScrollView>
 
             <View style={styles.modalActions}>
@@ -650,6 +703,14 @@ export default function HistoryScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Date Picker Modal for Edit Shift */}
+      <MiniDatePicker
+        visible={showDatePicker}
+        selectedDate={editDateStr}
+        onSelectDate={(newDate) => setEditDateStr(newDate)}
+        onClose={() => setShowDatePicker(false)}
+      />
     </View>
   );
 }
