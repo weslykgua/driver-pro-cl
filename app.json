@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Conductor Pro Chile",
+    "slug": "uber-driver-dashboard-cl",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "conductor-pro",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.conductorpro.chile"
+    },
+    "android": {
+      "package": "com.conductorpro.chile"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
