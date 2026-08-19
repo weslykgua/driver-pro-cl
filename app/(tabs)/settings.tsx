@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../_layout';
 import { supabase } from '../../lib/supabase';
 import { formatCLP } from '../../utils/calculations';
+import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -80,23 +81,23 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Ajustes del Sistema</Text>
-      <Text style={styles.subtitle}>Configuración de parámetros financieros y valores predeterminados</Text>
+      <Text style={styles.title}>Parámetros del Sistema</Text>
+      <Text style={styles.subtitle}>Configuración de variables financieras y tasas por defecto</Text>
 
       {/* User profile card */}
       <View style={styles.profileCard}>
         <View style={styles.avatarCircle}>
-          <Ionicons name="person-outline" size={20} color="#10B981" />
+          <Ionicons name="person-outline" size={18} color={COLORS.primary} />
         </View>
         <View style={styles.profileInfo}>
           <Text style={styles.userEmail}>{user?.email || 'Usuario Demo (Modo Evaluación)'}</Text>
-          <Text style={styles.userStatus}>Perfil de Conductor Activo</Text>
+          <Text style={styles.userStatus}>Cuenta de Usuario Activa</Text>
         </View>
       </View>
 
       {/* Settings Form */}
       <View style={styles.formCard}>
-        <Text style={styles.sectionHeader}>Parámetros Operativos Predeterminados</Text>
+        <Text style={styles.sectionHeader}>Configuración Operativa</Text>
 
         {/* Monthly Target */}
         <View style={styles.inputGroup}>
@@ -109,7 +110,7 @@ export default function SettingsScreen() {
               onChangeText={setMonthlyTargetStr}
               keyboardType="numeric"
               placeholder="1300000"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={COLORS.textMuted}
             />
           </View>
           <Text style={styles.helperText}>
@@ -128,7 +129,7 @@ export default function SettingsScreen() {
               onChangeText={setGasPriceStr}
               keyboardType="numeric"
               placeholder="1450"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={COLORS.textMuted}
             />
             <Text style={styles.unitSuffix}>/L</Text>
           </View>
@@ -138,14 +139,14 @@ export default function SettingsScreen() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Consumo Promedio Vehículo (L/100km)</Text>
           <View style={styles.inputWrapper}>
-            <Ionicons name="speedometer-outline" size={16} color="#94A3B8" style={styles.inputIcon} />
+            <Ionicons name="navigate-outline" size={16} color={COLORS.textMuted} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               value={consumptionStr}
               onChangeText={setConsumptionStr}
               keyboardType="decimal-pad"
               placeholder="7.4"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={COLORS.textMuted}
             />
             <Text style={styles.unitSuffix}>L/100km</Text>
           </View>
@@ -155,18 +156,18 @@ export default function SettingsScreen() {
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Tasa de Retención SII (%)</Text>
           <View style={styles.inputWrapper}>
-            <Ionicons name="receipt-outline" size={16} color="#94A3B8" style={styles.inputIcon} />
+            <Ionicons name="receipt-outline" size={16} color={COLORS.textMuted} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               value={taxRateStr}
               onChangeText={setTaxRateStr}
               keyboardType="decimal-pad"
               placeholder="15.25"
-              placeholderTextColor="#64748B"
+              placeholderTextColor={COLORS.textMuted}
             />
             <Text style={styles.unitSuffix}>%</Text>
           </View>
-          <Text style={styles.helperText}>Porcentaje legal aplicado a retención SII en Chile</Text>
+          <Text style={styles.helperText}>Tasa legal aplicada a servicios de transporte en Chile</Text>
         </View>
 
         {/* Save button */}
@@ -177,7 +178,7 @@ export default function SettingsScreen() {
           activeOpacity={0.8}
         >
           {saving ? (
-            <ActivityIndicator color="#0B0F17" />
+            <ActivityIndicator color="#FFFFFF" />
           ) : (
             <Text style={styles.saveButtonText}>Guardar Configuración</Text>
           )}
@@ -186,7 +187,7 @@ export default function SettingsScreen() {
 
       {/* Sign Out */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut} activeOpacity={0.8}>
-        <Ionicons name="log-out-outline" size={18} color="#EF4444" style={{ marginRight: 6 }} />
+        <Ionicons name="log-out-outline" size={16} color={COLORS.danger} style={{ marginRight: 6 }} />
         <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -196,7 +197,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: COLORS.background,
   },
   content: {
     padding: 16,
@@ -204,85 +205,87 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
-    color: '#F8FAFC',
+    fontWeight: '700',
+    color: COLORS.text,
     letterSpacing: -0.3,
     marginTop: 8,
   },
   subtitle: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: COLORS.textSecondary,
     marginBottom: 16,
   },
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#161E2E',
-    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
     marginBottom: 16,
+    ...SHADOWS.card,
   },
   avatarCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    width: 38,
+    height: 38,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
     borderWidth: 1,
-    borderColor: '#10B98133',
+    borderColor: COLORS.border,
   },
   profileInfo: {
     flex: 1,
   },
   userEmail: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#F8FAFC',
+    fontWeight: '600',
+    color: COLORS.text,
   },
   userStatus: {
     fontSize: 11,
-    color: '#10B981',
+    color: COLORS.success,
     marginTop: 2,
     fontWeight: '500',
   },
   formCard: {
-    backgroundColor: '#161E2E',
-    borderRadius: 14,
-    padding: 16,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: 18,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
     marginBottom: 16,
+    ...SHADOWS.card,
   },
   sectionHeader: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
     marginBottom: 14,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   inputGroup: {
     marginBottom: 14,
   },
   label: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#94A3B8',
+    fontWeight: '600',
+    color: COLORS.textSecondary,
     marginBottom: 6,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0B0F17',
-    borderRadius: 10,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.borderDark,
     paddingHorizontal: 12,
     height: 44,
   },
@@ -290,54 +293,54 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   currencySymbol: {
-    color: '#10B981',
-    fontWeight: '700',
+    color: COLORS.primary,
+    fontWeight: '600',
     fontSize: 15,
     marginRight: 6,
   },
   unitSuffix: {
-    color: '#64748B',
+    color: COLORS.textMuted,
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
     marginLeft: 6,
   },
   input: {
     flex: 1,
-    color: '#F8FAFC',
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
   helperText: {
     fontSize: 11,
-    color: '#64748B',
+    color: COLORS.textMuted,
     marginTop: 4,
   },
   saveButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.primary,
     height: 44,
-    borderRadius: 10,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
   },
   saveButtonText: {
-    color: '#0B0F17',
+    color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '600',
   },
   logoutButton: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: COLORS.surface,
     height: 44,
-    borderRadius: 10,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#EF444433',
+    borderColor: COLORS.dangerSoft,
   },
   logoutButtonText: {
-    color: '#EF4444',
+    color: COLORS.danger,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { formatCLP } from '../utils/calculations';
+import { COLORS, SHADOWS, RADIUS } from '../constants/theme';
 
 interface ProgressBarProps {
   current: number;
@@ -24,7 +25,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label
         <View style={[styles.fill, { width: `${percentage}%` }]} />
       </View>
 
-      {/* Bottom details */}
+      {/* Bottom Details */}
       <View style={styles.footer}>
         <Text style={styles.currentText}>
           Acumulado: <Text style={styles.highlight}>{formatCLP(current)}</Text>
@@ -39,12 +40,13 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, target, label
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#161E2E',
-    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
     marginVertical: 12,
+    ...SHADOWS.card,
   },
   header: {
     flexDirection: 'row',
@@ -53,29 +55,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   title: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   percentageText: {
     fontSize: 14,
-    fontWeight: '800',
-    color: '#10B981',
+    fontWeight: '700',
+    color: COLORS.primary,
   },
   track: {
     height: 8,
-    backgroundColor: '#0B0F17',
-    borderRadius: 4,
+    backgroundColor: COLORS.neutralSoft,
+    borderRadius: RADIUS.full,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#243044',
   },
   fill: {
     height: '100%',
-    backgroundColor: '#10B981',
-    borderRadius: 4,
+    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.full,
   },
   footer: {
     flexDirection: 'row',
@@ -84,15 +84,15 @@ const styles = StyleSheet.create({
   },
   currentText: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: COLORS.textSecondary,
   },
   highlight: {
-    color: '#F8FAFC',
-    fontWeight: '700',
+    color: COLORS.text,
+    fontWeight: '600',
   },
   remainingText: {
     fontSize: 12,
-    color: '#3B82F6',
+    color: COLORS.secondary,
     fontWeight: '600',
   },
 });

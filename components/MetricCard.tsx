@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS, SHADOWS, RADIUS } from '../constants/theme';
 
 interface MetricCardProps {
   title: string;
@@ -19,87 +20,91 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   variant = 'slate',
   style,
 }) => {
-  const getColors = () => {
+  const getVariantStyles = () => {
     switch (variant) {
       case 'emerald':
-        return { iconBg: '#064E3B', iconColor: '#10B981', border: '#05966944' };
-      case 'amber':
-        return { iconBg: '#78350F', iconColor: '#F59E0B', border: '#D9770644' };
+        return { valueColor: COLORS.success, badgeBg: COLORS.successSoft, badgeText: COLORS.success };
       case 'red':
-        return { iconBg: '#7F1D1D', iconColor: '#EF4444', border: '#DC262644' };
+        return { valueColor: COLORS.danger, badgeBg: COLORS.dangerSoft, badgeText: COLORS.danger };
+      case 'amber':
+        return { valueColor: COLORS.warning, badgeBg: COLORS.warningSoft, badgeText: COLORS.warning };
       case 'blue':
-        return { iconBg: '#1E3A8A', iconColor: '#3B82F6', border: '#2563EB44' };
-      case 'purple':
-        return { iconBg: '#581C87', iconColor: '#A855F7', border: '#9333EA44' };
+        return { valueColor: COLORS.primary, badgeBg: COLORS.infoSoft, badgeText: COLORS.primary };
       default:
-        return { iconBg: '#1E293B', iconColor: '#94A3B8', border: '#334155' };
+        return { valueColor: COLORS.text, badgeBg: COLORS.neutralSoft, badgeText: COLORS.textSecondary };
     }
   };
 
-  const colors = getColors();
+  const vStyles = getVariantStyles();
 
   return (
-    <View style={[styles.card, { borderColor: colors.border }, style]}>
+    <View style={[styles.card, style]}>
       <View style={styles.headerRow}>
         <Text style={styles.title} numberOfLines={1}>
           {title}
         </Text>
         {iconName && (
-          <View style={[styles.iconContainer, { backgroundColor: colors.iconBg }]}>
-            <Ionicons name={iconName} size={16} color={colors.iconColor} />
+          <View style={styles.iconWrapper}>
+            <Ionicons name={iconName} size={16} color={COLORS.textSecondary} />
           </View>
         )}
       </View>
 
-      <Text style={[styles.value, variant === 'emerald' && styles.emeraldText]}>{value}</Text>
-      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      <Text style={[styles.value, { color: vStyles.valueColor }]}>{value}</Text>
+      
+      {subtitle && (
+        <View style={styles.subtitleContainer}>
+          <Text style={styles.subtitleText}>{subtitle}</Text>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#161E2E',
-    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   title: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#94A3B8',
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
     textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    letterSpacing: 0.4,
     flex: 1,
     marginRight: 8,
   },
-  iconContainer: {
+  iconWrapper: {
     width: 28,
     height: 28,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   value: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#F8FAFC',
+    color: COLORS.text,
     letterSpacing: -0.5,
-    fontVariant: ['tabular-nums'],
   },
-  emeraldText: {
-    color: '#10B981',
+  subtitleContainer: {
+    marginTop: 6,
   },
-  subtitle: {
-    fontSize: 11,
-    color: '#64748B',
-    marginTop: 4,
+  subtitleText: {
+    fontSize: 12,
+    color: COLORS.textMuted,
+    fontWeight: '400',
   },
 });

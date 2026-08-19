@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS, RADIUS, SHADOWS } from '../constants/theme';
 
 interface MiniDatePickerProps {
   visible: boolean;
@@ -44,7 +45,6 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
     }
   };
 
-  // Generate matrix of days for the current month view
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
@@ -69,7 +69,7 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
           {/* Header Month / Year controls */}
           <View style={styles.header}>
             <TouchableOpacity onPress={handlePrevMonth} style={styles.arrowButton}>
-              <Ionicons name="chevron-back" size={20} color="#F8FAFC" />
+              <Ionicons name="chevron-back" size={18} color={COLORS.textSecondary} />
             </TouchableOpacity>
 
             <Text style={styles.monthYearText}>
@@ -77,7 +77,7 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
             </Text>
 
             <TouchableOpacity onPress={handleNextMonth} style={styles.arrowButton}>
-              <Ionicons name="chevron-forward" size={20} color="#F8FAFC" />
+              <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -130,11 +130,14 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
           </View>
 
           {/* Footer Action */}
-          <TouchableOpacity style={styles.todayButton} onPress={() => {
-            const today = new Date().toISOString().split('T')[0];
-            onSelectDate(today);
-            onClose();
-          }}>
+          <TouchableOpacity
+            style={styles.todayButton}
+            onPress={() => {
+              const today = new Date().toISOString().split('T')[0];
+              onSelectDate(today);
+              onClose();
+            }}
+          >
             <Text style={styles.todayButtonText}>Seleccionar Hoy</Text>
           </TouchableOpacity>
         </TouchableOpacity>
@@ -146,19 +149,20 @@ export const MiniDatePicker: React.FC<MiniDatePickerProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(23, 32, 51, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   calendarCard: {
-    backgroundColor: '#161E2E',
-    borderRadius: 16,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     padding: 20,
     width: '100%',
     maxWidth: 340,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   header: {
     flexDirection: 'row',
@@ -169,17 +173,15 @@ const styles = StyleSheet.create({
   arrowButton: {
     width: 32,
     height: 32,
-    borderRadius: 8,
-    backgroundColor: '#0B0F17',
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#243044',
   },
   monthYearText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#F8FAFC',
+    color: COLORS.text,
   },
   daysOfWeekRow: {
     flexDirection: 'row',
@@ -191,8 +193,8 @@ const styles = StyleSheet.create({
     width: 38,
     textAlign: 'center',
     fontSize: 12,
-    fontWeight: '700',
-    color: '#64748B',
+    fontWeight: '600',
+    color: COLORS.textMuted,
   },
   grid: {
     flexDirection: 'row',
@@ -207,41 +209,39 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     marginVertical: 2,
   },
   dayCellSelected: {
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.primary,
   },
   dayCellToday: {
     borderWidth: 1,
-    borderColor: '#3B82F6',
+    borderColor: COLORS.primary,
   },
   dayText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#CBD5E1',
+    fontWeight: '500',
+    color: COLORS.text,
   },
   dayTextSelected: {
-    color: '#0B0F17',
-    fontWeight: '800',
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   dayTextToday: {
-    color: '#3B82F6',
+    color: COLORS.primary,
     fontWeight: '700',
   },
   todayButton: {
     marginTop: 16,
-    backgroundColor: '#0B0F17',
+    backgroundColor: COLORS.neutralSoft,
     paddingVertical: 10,
-    borderRadius: 10,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#243044',
   },
   todayButtonText: {
-    color: '#10B981',
+    color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
   },
 });

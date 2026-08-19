@@ -19,6 +19,7 @@ import { LiveSummaryCard } from '../../components/LiveSummaryCard';
 import { MiniDatePicker } from '../../components/MiniDatePicker';
 import { calculateDailyMetrics } from '../../utils/calculations';
 import { ShiftInput } from '../../types/database';
+import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function NewShiftScreen() {
   const router = useRouter();
@@ -131,31 +132,31 @@ export default function NewShiftScreen() {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Registro Diario de Turno</Text>
-        <Text style={styles.subtitle}>Ingrese los valores observados al finalizar su jornada</Text>
+        <Text style={styles.title}>Registro de Jornada Operativa</Text>
+        <Text style={styles.subtitle}>Ingrese las métricas observadas al cierre de turno</Text>
 
         {/* Live Metrics Summary Card */}
         <LiveSummaryCard metrics={liveMetrics} siiTaxRatePercentage={siiTaxRate * 100} />
 
         {/* Form Controls */}
         <View style={styles.formCard}>
-          {/* Shift Date with Mini Calendar Trigger */}
+          {/* Shift Date */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Fecha del Turno</Text>
+            <Text style={styles.label}>Fecha de Operación</Text>
             <TouchableOpacity
               style={styles.inputWrapper}
               onPress={() => setShowDatePicker(true)}
               activeOpacity={0.8}
             >
-              <Ionicons name="calendar-outline" size={18} color="#10B981" style={styles.inputIcon} />
+              <Ionicons name="calendar-outline" size={16} color={COLORS.primary} style={styles.inputIcon} />
               <Text style={styles.dateDisplayText}>{shiftDate}</Text>
-              <Text style={styles.changeDateText}>Cambiar</Text>
+              <Text style={styles.changeDateText}>Seleccionar</Text>
             </TouchableOpacity>
           </View>
 
           {/* Gross Earnings App ($ CLP) */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Ganancia Bruta App ($ CLP)</Text>
+            <Text style={styles.label}>Ganancia Bruta en Plataforma ($ CLP)</Text>
             <View style={styles.inputWrapper}>
               <Text style={styles.currencySymbol}>$</Text>
               <TextInput
@@ -164,14 +165,14 @@ export default function NewShiftScreen() {
                 onChangeText={setGrossEarningsStr}
                 keyboardType="numeric"
                 placeholder="75000"
-                placeholderTextColor="#64748B"
+                placeholderTextColor={COLORS.textMuted}
               />
             </View>
           </View>
 
           {/* Cash Collected in Hand ($ CLP) */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Efectivo Cobrado a Pasajeros ($ CLP)</Text>
+            <Text style={styles.label}>Efectivo Recibido de Pasajeros ($ CLP)</Text>
             <View style={styles.inputWrapper}>
               <Text style={styles.currencySymbol}>$</Text>
               <TextInput
@@ -180,12 +181,12 @@ export default function NewShiftScreen() {
                 onChangeText={setCashCollectedStr}
                 keyboardType="numeric"
                 placeholder="15000"
-                placeholderTextColor="#64748B"
+                placeholderTextColor={COLORS.textMuted}
               />
             </View>
           </View>
 
-          {/* Connected Time: Hours and Minutes */}
+          {/* Connected Time */}
           <Text style={styles.label}>Tiempo Conectado Total</Text>
           <View style={styles.rowTwoInputs}>
             <View style={[styles.inputGroup, { flex: 1 }]}>
@@ -196,7 +197,7 @@ export default function NewShiftScreen() {
                   onChangeText={setHoursStr}
                   keyboardType="numeric"
                   placeholder="7"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor={COLORS.textMuted}
                 />
                 <Text style={styles.unitSuffix}>Horas</Text>
               </View>
@@ -210,34 +211,34 @@ export default function NewShiftScreen() {
                   onChangeText={setMinutesStr}
                   keyboardType="numeric"
                   placeholder="30"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor={COLORS.textMuted}
                 />
                 <Text style={styles.unitSuffix}>Mins</Text>
               </View>
             </View>
           </View>
 
-          {/* Odometer Mileage (km) - MODIFIABLE PER SHIFT */}
+          {/* Odometer Mileage (km) */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Kilómetros Recorridos (Odómetro)</Text>
+            <Text style={styles.label}>Kilometraje Recorrido (Odómetro)</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="speedometer-outline" size={18} color="#94A3B8" style={styles.inputIcon} />
+              <Ionicons name="navigate-outline" size={16} color={COLORS.textMuted} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 value={distanceKmStr}
                 onChangeText={setDistanceKmStr}
                 keyboardType="decimal-pad"
                 placeholder="175"
-                placeholderTextColor="#64748B"
+                placeholderTextColor={COLORS.textMuted}
               />
               <Text style={styles.unitSuffix}>km</Text>
             </View>
           </View>
 
-          {/* Fuel Consumption (L/100km) & Gas Price ($/L) - MODIFIABLE PER SHIFT */}
+          {/* Fuel Consumption & Gas Price */}
           <View style={styles.rowTwoInputs}>
             <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Consumo Tablero</Text>
+              <Text style={styles.label}>Consumo Promedio</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
@@ -245,14 +246,14 @@ export default function NewShiftScreen() {
                   onChangeText={setFuelConsumptionStr}
                   keyboardType="decimal-pad"
                   placeholder="7.4"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor={COLORS.textMuted}
                 />
                 <Text style={styles.unitSuffix}>L/100km</Text>
               </View>
             </View>
 
             <View style={[styles.inputGroup, { flex: 1 }]}>
-              <Text style={styles.label}>Precio Bencina</Text>
+              <Text style={styles.label}>Precio Combustible</Text>
               <View style={styles.inputWrapper}>
                 <Text style={styles.currencySymbol}>$</Text>
                 <TextInput
@@ -261,7 +262,7 @@ export default function NewShiftScreen() {
                   onChangeText={setGasPriceStr}
                   keyboardType="numeric"
                   placeholder="1450"
-                  placeholderTextColor="#64748B"
+                  placeholderTextColor={COLORS.textMuted}
                 />
                 <Text style={styles.unitSuffix}>/L</Text>
               </View>
@@ -270,8 +271,8 @@ export default function NewShiftScreen() {
 
           {/* Optional Notes */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Observaciones (Opcional)</Text>
-            <View style={[styles.inputWrapper, { height: 64, alignItems: 'flex-start', paddingTop: 8 }]}>
+            <Text style={styles.label}>Observaciones Operativas</Text>
+            <View style={[styles.inputWrapper, { height: 60, alignItems: 'flex-start', paddingTop: 8 }]}>
               <TextInput
                 style={[styles.input, { textAlignVertical: 'top' }]}
                 value={notes}
@@ -279,7 +280,7 @@ export default function NewShiftScreen() {
                 multiline
                 numberOfLines={2}
                 placeholder="Notas de la jornada..."
-                placeholderTextColor="#64748B"
+                placeholderTextColor={COLORS.textMuted}
               />
             </View>
           </View>
@@ -292,18 +293,14 @@ export default function NewShiftScreen() {
             activeOpacity={0.8}
           >
             {saving ? (
-              <ActivityIndicator color="#0B0F17" />
+              <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <>
-                <Ionicons name="checkmark-sharp" size={20} color="#0B0F17" style={{ marginRight: 6 }} />
-                <Text style={styles.saveButtonText}>Guardar Registro</Text>
-              </>
+              <Text style={styles.saveButtonText}>Guardar Registro Operativo</Text>
             )}
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* Popover Mini Date Picker */}
       <MiniDatePicker
         visible={showDatePicker}
         selectedDate={shiftDate}
@@ -317,7 +314,7 @@ export default function NewShiftScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: COLORS.background,
   },
   content: {
     padding: 16,
@@ -325,73 +322,74 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
-    color: '#F8FAFC',
+    fontWeight: '700',
+    color: COLORS.text,
     letterSpacing: -0.3,
     marginTop: 8,
   },
   subtitle: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: COLORS.textSecondary,
     marginBottom: 8,
   },
   formCard: {
-    backgroundColor: '#161E2E',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: 18,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   inputGroup: {
     marginBottom: 14,
   },
   label: {
     fontSize: 11,
-    fontWeight: '700',
-    color: '#94A3B8',
+    fontWeight: '600',
+    color: COLORS.textSecondary,
     marginBottom: 6,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0B0F17',
-    borderRadius: 10,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.borderDark,
     paddingHorizontal: 12,
-    height: 46,
+    height: 44,
   },
   inputIcon: {
     marginRight: 8,
   },
   dateDisplayText: {
     flex: 1,
-    color: '#F8FAFC',
+    color: COLORS.text,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   changeDateText: {
-    color: '#10B981',
+    color: COLORS.primary,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   currencySymbol: {
-    color: '#10B981',
-    fontWeight: '700',
+    color: COLORS.primary,
+    fontWeight: '600',
     fontSize: 15,
     marginRight: 6,
   },
   unitSuffix: {
-    color: '#64748B',
+    color: COLORS.textMuted,
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
     marginLeft: 6,
   },
   input: {
     flex: 1,
-    color: '#F8FAFC',
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -400,17 +398,16 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   saveButton: {
-    flexDirection: 'row',
-    backgroundColor: '#10B981',
-    height: 48,
-    borderRadius: 10,
+    backgroundColor: COLORS.primary,
+    height: 44,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
   },
   saveButtonText: {
-    color: '#0B0F17',
-    fontSize: 15,
-    fontWeight: '800',
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

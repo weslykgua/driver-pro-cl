@@ -15,6 +15,7 @@ import { DailyShift } from '../../types/database';
 import { MetricCard } from '../../components/MetricCard';
 import { ProgressBar } from '../../components/ProgressBar';
 import { formatCLP } from '../../utils/calculations';
+import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
 
 const MOCK_SHIFTS: DailyShift[] = [
   {
@@ -139,13 +140,13 @@ export default function DashboardScreen() {
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#10B981" />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
       }
     >
       {/* Header Bar */}
       <View style={styles.headerRow}>
         <View>
-          <Text style={styles.welcomeText}>Panel Consolidado Mensual</Text>
+          <Text style={styles.welcomeText}>Resumen Consolidado</Text>
           <Text style={styles.dateBadgeText}>
             {new Date().toLocaleDateString('es-CL', { month: 'long', year: 'numeric' })}
           </Text>
@@ -156,35 +157,35 @@ export default function DashboardScreen() {
           onPress={() => router.push('/(tabs)/new-shift')}
           activeOpacity={0.8}
         >
-          <Ionicons name="add" size={16} color="#0B0F17" />
-          <Text style={styles.newShiftButtonText}>Nuevo Turno</Text>
+          <Ionicons name="add" size={16} color="#FFFFFF" />
+          <Text style={styles.newShiftButtonText}>Registrar Turno</Text>
         </TouchableOpacity>
       </View>
 
       {/* Target Progress Bar */}
-      <ProgressBar current={totalPocketNet} target={monthlyTarget} label="Meta Líquida en Bolsillo" />
+      <ProgressBar current={totalPocketNet} target={monthlyTarget} label="Meta Mensual Líquida" />
 
-      {/* Corporate Pace Calculator Card */}
+      {/* Corporate Pace Calculator */}
       <View style={styles.paceCard}>
         <View style={styles.paceHeaderRow}>
-          <Ionicons name="speedometer-outline" size={18} color="#3B82F6" />
-          <Text style={styles.paceTitle}>Calculador de Ritmo Operativo</Text>
+          <Ionicons name="calculator-outline" size={16} color={COLORS.primary} />
+          <Text style={styles.paceTitle}>Proyección Operativa</Text>
         </View>
 
         {remainingPocket > 0 ? (
           <Text style={styles.paceBodyText}>
-            Al promedio actual de <Text style={styles.paceHighlight}>{formatCLP(avgNetPerHour)}/h</Text>, se requieren aproximadamente{' '}
-            <Text style={styles.paceHighlight}>{hoursNeeded} horas acumuladas</Text> (~{daysNeeded} jornadas de trabajo) para alcanzar la meta mensual.
+            A una tasa promedio de <Text style={styles.paceHighlight}>{formatCLP(avgNetPerHour)}/h</Text>, se requieren aproximadamente{' '}
+            <Text style={styles.paceHighlight}>{hoursNeeded} horas</Text> (~{daysNeeded} jornadas) para alcanzar el objetivo mensual.
           </Text>
         ) : (
           <Text style={styles.paceBodyTextSuccess}>
-            Meta mensual cumplida ({formatCLP(monthlyTarget)}). Los ingresos adicionales corresponden a excedente neto.
+            Meta de {formatCLP(monthlyTarget)} alcanzada. Los ingresos adicionales constituyen excedente neto.
           </Text>
         )}
       </View>
 
       {/* Main KPI Cards Grid */}
-      <Text style={styles.sectionTitle}>Métricas Financieras del Mes</Text>
+      <Text style={styles.sectionTitle}>Métricas Financieras del Período</Text>
 
       <View style={styles.gridContainer}>
         {/* Total Pocket Net */}
@@ -209,7 +210,7 @@ export default function DashboardScreen() {
           <MetricCard
             title="Retención SII Total"
             value={formatCLP(totalSiiTax)}
-            subtitle="Tasa 15.25%"
+            subtitle="Tasa legal 15.25%"
             iconName="receipt-outline"
             variant="amber"
             style={styles.halfCard}
@@ -222,13 +223,13 @@ export default function DashboardScreen() {
             value={formatCLP(totalCashCollected)}
             subtitle="Cobrado en mano"
             iconName="cash-outline"
-            variant="purple"
+            variant="slate"
             style={styles.halfCard}
           />
           <MetricCard
             title="Saldo App Transferible"
             value={formatCLP(totalAppBalance)}
-            subtitle="Saldo transferible"
+            subtitle="Saldo en plataforma"
             iconName="card-outline"
             variant="blue"
             style={styles.halfCard}
@@ -237,7 +238,7 @@ export default function DashboardScreen() {
 
         <View style={styles.twoColumnRow}>
           <MetricCard
-            title="Promedio Real / Hora"
+            title="Promedio / Hora"
             value={`${formatCLP(avgNetPerHour)}/h`}
             subtitle={`${totalHours.toFixed(1)} hrs conectadas`}
             iconName="time-outline"
@@ -245,7 +246,7 @@ export default function DashboardScreen() {
             style={styles.halfCard}
           />
           <MetricCard
-            title="Promedio Real / Km"
+            title="Promedio / Km"
             value={`${formatCLP(avgNetPerKm)}/km`}
             subtitle={`${totalKm} km recorridos`}
             iconName="navigate-outline"
@@ -261,7 +262,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B0F17',
+    backgroundColor: COLORS.background,
   },
   content: {
     padding: 16,
@@ -276,37 +277,38 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 20,
-    fontWeight: '800',
-    color: '#F8FAFC',
+    fontWeight: '700',
+    color: COLORS.text,
     letterSpacing: -0.3,
   },
   dateBadgeText: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: COLORS.textSecondary,
     textTransform: 'capitalize',
     marginTop: 2,
   },
   newShiftButton: {
     flexDirection: 'row',
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   newShiftButtonText: {
-    color: '#0B0F17',
-    fontWeight: '700',
+    color: '#FFFFFF',
+    fontWeight: '600',
     fontSize: 12,
   },
   paceCard: {
-    backgroundColor: '#161E2E',
-    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
     marginBottom: 16,
+    ...SHADOWS.card,
   },
   paceHeaderRow: {
     flexDirection: 'row',
@@ -315,35 +317,35 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   paceTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#3B82F6',
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.primary,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   paceBodyText: {
     fontSize: 13,
-    color: '#CBD5E1',
+    color: COLORS.textSecondary,
     lineHeight: 20,
   },
   paceBodyTextSuccess: {
     fontSize: 13,
-    color: '#10B981',
+    color: COLORS.success,
     lineHeight: 20,
     fontWeight: '600',
   },
   paceHighlight: {
-    color: '#F8FAFC',
-    fontWeight: '700',
+    color: COLORS.text,
+    fontWeight: '600',
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#F8FAFC',
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
     marginTop: 8,
     marginBottom: 12,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   gridContainer: {
     gap: 12,

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { CalculatedMetrics } from '../types/database';
 import { formatCLP } from '../utils/calculations';
+import { COLORS, SHADOWS, RADIUS } from '../constants/theme';
 
 interface LiveSummaryCardProps {
   metrics: CalculatedMetrics;
@@ -12,44 +13,44 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
-        <View style={styles.indicatorContainer}>
-          <View style={styles.activeDot} />
-          <Text style={styles.headerTitle}>RESUMEN FINANCIERO EN TIEMPO REAL</Text>
+        <View style={styles.badge}>
+          <View style={styles.statusDot} />
+          <Text style={styles.headerTitle}>RESUMEN EN TIEMPO REAL</Text>
         </View>
       </View>
 
-      {/* Main Net Pocket Income */}
+      {/* Main Net Income */}
       <View style={styles.heroContainer}>
-        <Text style={styles.heroLabel}>Líquido Neto en Bolsillo</Text>
+        <Text style={styles.heroLabel}>Líquido Neto Estimado en Bolsillo</Text>
         <Text style={styles.heroValue}>{formatCLP(metrics.pocketNet)}</Text>
-        <Text style={styles.heroSubtext}>Resultado libre descontando impuestos (SII) y combustible</Text>
+        <Text style={styles.heroSubtext}>Monto disponible tras retención legal SII y gasto estimado de combustible</Text>
       </View>
 
       <View style={styles.divider} />
 
-      {/* Breakdown Grid */}
+      {/* Breakdown Items */}
       <View style={styles.gridContainer}>
         <View style={styles.gridRow}>
           <Text style={styles.rowLabel}>Saldo App Transferible</Text>
-          <Text style={[styles.rowValue, { color: metrics.appBalance >= 0 ? '#3B82F6' : '#EF4444' }]}>
+          <Text style={[styles.rowValue, { color: metrics.appBalance >= 0 ? COLORS.secondary : COLORS.danger }]}>
             {formatCLP(metrics.appBalance)}
           </Text>
         </View>
 
         <View style={styles.gridRow}>
-          <Text style={styles.rowLabel}>Combustible Consumido ({metrics.fuelLiters} L)</Text>
-          <Text style={[styles.rowValue, { color: '#EF4444' }]}>-{formatCLP(metrics.fuelCost)}</Text>
+          <Text style={styles.rowLabel}>Combustible Estimado ({metrics.fuelLiters} L)</Text>
+          <Text style={[styles.rowValue, { color: COLORS.danger }]}>-{formatCLP(metrics.fuelCost)}</Text>
         </View>
 
         <View style={styles.gridRow}>
-          <Text style={styles.rowLabel}>Retención SII ({siiTaxRatePercentage.toFixed(2)}%)</Text>
-          <Text style={[styles.rowValue, { color: '#F59E0B' }]}>-{formatCLP(metrics.siiTaxAmount)}</Text>
+          <Text style={styles.rowLabel}>Retención Legal SII ({siiTaxRatePercentage.toFixed(2)}%)</Text>
+          <Text style={[styles.rowValue, { color: COLORS.warning }]}>-{formatCLP(metrics.siiTaxAmount)}</Text>
         </View>
       </View>
 
       <View style={styles.divider} />
 
-      {/* Corporate Performance Indicators */}
+      {/* Performance KPIs */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiBox}>
           <Text style={styles.kpiLabel}>Rendimiento / Hora</Text>
@@ -72,62 +73,66 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#161E2E',
-    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#05966966',
+    borderColor: COLORS.border,
     marginVertical: 14,
+    ...SHADOWS.card,
   },
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: 12,
   },
-  indicatorContainer: {
+  badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.successSoft,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: RADIUS.sm,
+    gap: 6,
   },
-  activeDot: {
+  statusDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.success,
   },
   headerTitle: {
     fontSize: 10,
-    fontWeight: '800',
-    color: '#10B981',
-    letterSpacing: 1.2,
+    fontWeight: '700',
+    color: COLORS.success,
+    letterSpacing: 0.8,
   },
   heroContainer: {
     alignItems: 'center',
     paddingVertical: 10,
   },
   heroLabel: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-    color: '#94A3B8',
+    color: COLORS.textSecondary,
     marginBottom: 4,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   heroValue: {
     fontSize: 32,
-    fontWeight: '800',
-    color: '#10B981',
-    letterSpacing: -1,
+    fontWeight: '700',
+    color: COLORS.success,
+    letterSpacing: -0.5,
   },
   heroSubtext: {
     fontSize: 11,
-    color: '#64748B',
+    color: COLORS.textMuted,
     marginTop: 4,
+    textAlign: 'center',
   },
   divider: {
     height: 1,
-    backgroundColor: '#243044',
+    backgroundColor: COLORS.border,
     marginVertical: 14,
   },
   gridContainer: {
@@ -140,38 +145,38 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     fontSize: 13,
-    color: '#CBD5E1',
+    color: COLORS.textSecondary,
     fontWeight: '500',
   },
   rowValue: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   kpiRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
   kpiBox: {
     flex: 1,
-    backgroundColor: '#0B0F17',
-    borderRadius: 8,
+    backgroundColor: COLORS.surfaceSubtle,
+    borderRadius: RADIUS.sm,
     paddingVertical: 10,
     paddingHorizontal: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#243044',
+    borderColor: COLORS.border,
   },
   kpiLabel: {
-    fontSize: 9,
-    color: '#64748B',
-    fontWeight: '700',
+    fontSize: 10,
+    color: COLORS.textMuted,
+    fontWeight: '600',
     textTransform: 'uppercase',
     marginBottom: 4,
-    letterSpacing: 0.4,
+    letterSpacing: 0.3,
   },
   kpiValue: {
-    fontSize: 12,
-    color: '#F8FAFC',
+    fontSize: 13,
+    color: COLORS.text,
     fontWeight: '700',
   },
 });

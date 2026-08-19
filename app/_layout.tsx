@@ -5,6 +5,7 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
+import { COLORS } from '../constants/theme';
 
 interface AuthContextType {
   session: Session | null;
@@ -113,18 +114,19 @@ export default function RootLayout() {
                 width: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                background-color: #0B0F17 !important;
+                background-color: ${COLORS.background} !important;
                 display: flex !important;
                 flex-direction: column !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
               }
             `
           }} />
         )}
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: '#0B0F17', flex: 1 },
+            contentStyle: { backgroundColor: COLORS.background, flex: 1 },
             animation: 'fade',
           }}
         >
@@ -142,6 +144,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    backgroundColor: '#0B0F17',
+    backgroundColor: COLORS.background,
   },
 });

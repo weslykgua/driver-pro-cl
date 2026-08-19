@@ -15,6 +15,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
+import { COLORS, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -84,32 +85,32 @@ export default function LoginScreen() {
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={[styles.cardContainer, isDesktop && styles.cardDesktop]}>
-          {/* Logo / App Brand */}
+          {/* Corporate Brand Header */}
           <View style={styles.brandContainer}>
-            <View style={[styles.logoBadge, isDesktop && styles.logoBadgeDesktop]}>
-              <Ionicons name="car-sport" size={isDesktop ? 44 : 36} color="#10B981" />
+            <View style={styles.logoBadge}>
+              <Ionicons name="shield-checkmark" size={28} color={COLORS.primary} />
             </View>
-            <Text style={[styles.appName, isDesktop && styles.appNameDesktop]}>Conductor Pro</Text>
-            <Text style={styles.appTagline}>Control Diario de Ganancias en Chile 🇨🇱</Text>
+            <Text style={styles.appName}>Conductor Pro</Text>
+            <Text style={styles.appTagline}>Gestión Financiera para Conductores de Transporte</Text>
           </View>
 
           {/* Subtitle */}
           <Text style={styles.formTitle}>
-            {isSignUp ? 'Crear Cuenta Conductor' : 'Iniciar Sesión'}
+            {isSignUp ? 'Registro de Cuenta' : 'Acceso Institucional'}
           </Text>
           <Text style={styles.formSubtitle}>
-            Calcula retención SII (15.25%), bencina y líquido real en 15 segundos.
+            Control preciso de retención SII, gastos operativos y líquido neto
           </Text>
 
           {/* Form Inputs */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Correo Electrónico</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="mail-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+              <Ionicons name="mail-outline" size={18} color={COLORS.textMuted} style={styles.inputIcon} />
               <TextInput
                 style={styles.textInput}
-                placeholder="conductor@ejemplo.cl"
-                placeholderTextColor="#64748B"
+                placeholder="conductor@empresa.cl"
+                placeholderTextColor={COLORS.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -121,11 +122,11 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Contraseña</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" style={styles.inputIcon} />
+              <Ionicons name="lock-closed-outline" size={18} color={COLORS.textMuted} style={styles.inputIcon} />
               <TextInput
                 style={styles.textInput}
                 placeholder="••••••••"
-                placeholderTextColor="#64748B"
+                placeholderTextColor={COLORS.textMuted}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
@@ -133,7 +134,7 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          {/* Primary Action Button */}
+          {/* Primary Button */}
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={handleEmailAuth}
@@ -141,10 +142,10 @@ export default function LoginScreen() {
             activeOpacity={0.8}
           >
             {loading ? (
-              <ActivityIndicator color="#0F172A" />
+              <ActivityIndicator color="#FFFFFF" />
             ) : (
               <Text style={styles.primaryButtonText}>
-                {isSignUp ? 'Registrarme' : 'Ingresar'}
+                {isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}
               </Text>
             )}
           </TouchableOpacity>
@@ -156,27 +157,27 @@ export default function LoginScreen() {
             disabled={loading}
             activeOpacity={0.8}
           >
-            <Ionicons name="logo-google" size={20} color="#F8FAFC" style={{ marginRight: 10 }} />
-            <Text style={styles.googleButtonText}>Continuar con Google</Text>
+            <Ionicons name="logo-google" size={18} color={COLORS.text} style={{ marginRight: 8 }} />
+            <Text style={styles.googleButtonText}>Acceder con Google</Text>
           </TouchableOpacity>
 
           {/* Toggle Login / SignUp */}
           <TouchableOpacity style={styles.toggleButton} onPress={() => setIsSignUp(!isSignUp)}>
             <Text style={styles.toggleText}>
-              {isSignUp ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate gratis'}
+              {isSignUp ? '¿Ya tienes cuenta? Inicia sesión' : '¿Nuevo usuario? Crear cuenta corporativa'}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.dividerRow}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>O PRUEBA SIN REGISTRO</Text>
+            <Text style={styles.dividerText}>MODO EVALUACIÓN</Text>
             <View style={styles.dividerLine} />
           </View>
 
           {/* Quick Demo Mode */}
           <TouchableOpacity style={styles.demoButton} onPress={handleDemoMode} activeOpacity={0.8}>
-            <Ionicons name="flash-outline" size={18} color="#3B82F6" style={{ marginRight: 6 }} />
-            <Text style={styles.demoButtonText}>Modo Demo Inmediato</Text>
+            <Ionicons name="cube-outline" size={16} color={COLORS.secondary} style={{ marginRight: 6 }} />
+            <Text style={styles.demoButtonText}>Acceso Directo (Modo Demo)</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -187,13 +188,8 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: COLORS.background,
     width: '100%',
-    ...(Platform.OS === 'web'
-      ? {
-          minHeight: '100vh' as any,
-        }
-      : {}),
   },
   scrollContent: {
     flexGrow: 1,
@@ -202,21 +198,17 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   cardContainer: {
-    backgroundColor: '#1E293B',
-    borderRadius: 24,
-    padding: 24,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: 28,
     width: '100%',
-    maxWidth: 460,
+    maxWidth: 440,
     borderWidth: 1,
-    borderColor: '#334155',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 8,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   cardDesktop: {
-    maxWidth: 540,
+    maxWidth: 480,
     padding: 36,
   },
   brandContainer: {
@@ -224,101 +216,96 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   logoBadge: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    width: 52,
+    height: 52,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.neutralSoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#10B98133',
-  },
-  logoBadgeDesktop: {
-    width: 76,
-    height: 76,
-    borderRadius: 24,
+    borderColor: COLORS.border,
   },
   appName: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: '#F8FAFC',
-    letterSpacing: -0.5,
-  },
-  appNameDesktop: {
-    fontSize: 32,
+    fontSize: 24,
+    fontWeight: '700',
+    color: COLORS.primary,
+    letterSpacing: -0.3,
   },
   appTagline: {
-    fontSize: 13,
-    color: '#94A3B8',
+    fontSize: 12,
+    color: COLORS.textSecondary,
     marginTop: 4,
+    textAlign: 'center',
   },
   formTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
-    color: '#F8FAFC',
+    color: COLORS.text,
     textAlign: 'center',
   },
   formSubtitle: {
     fontSize: 12,
-    color: '#64748B',
+    color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: 4,
     marginBottom: 20,
   },
   inputContainer: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   inputLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#CBD5E1',
+    color: COLORS.textSecondary,
     marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
-    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: COLORS.borderDark,
     paddingHorizontal: 12,
-    height: 48,
+    height: 44,
   },
   inputIcon: {
     marginRight: 8,
   },
   textInput: {
     flex: 1,
-    color: '#F8FAFC',
+    color: COLORS.text,
     fontSize: 14,
   },
   primaryButton: {
-    backgroundColor: '#10B981',
-    height: 48,
-    borderRadius: 12,
+    backgroundColor: COLORS.primary,
+    height: 44,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 8,
   },
   primaryButtonText: {
-    color: '#0F172A',
-    fontSize: 15,
-    fontWeight: '700',
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
   googleButton: {
     flexDirection: 'row',
-    backgroundColor: '#334155',
-    height: 48,
-    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+    height: 44,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 10,
     borderWidth: 1,
-    borderColor: '#475569',
+    borderColor: COLORS.borderDark,
   },
   googleButtonText: {
-    color: '#F8FAFC',
+    color: COLORS.text,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -327,7 +314,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   toggleText: {
-    color: '#10B981',
+    color: COLORS.primary,
     fontSize: 13,
     fontWeight: '600',
   },
@@ -339,28 +326,28 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#334155',
+    backgroundColor: COLORS.border,
   },
   dividerText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#64748B',
+    color: COLORS.textMuted,
     paddingHorizontal: 10,
     letterSpacing: 0.5,
   },
   demoButton: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(59, 130, 246, 0.12)',
-    height: 44,
-    borderRadius: 12,
+    backgroundColor: COLORS.neutralSoft,
+    height: 42,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#3B82F644',
+    borderColor: COLORS.border,
   },
   demoButtonText: {
-    color: '#3B82F6',
-    fontSize: 14,
-    fontWeight: '700',
+    color: COLORS.secondary,
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
