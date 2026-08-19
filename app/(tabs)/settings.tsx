@@ -8,13 +8,14 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../_layout';
 import { supabase } from '../../lib/supabase';
 import { formatCLP } from '../../utils/calculations';
-import { useTheme, RADIUS, SHADOWS, ThemeMode } from '../../constants/theme';
+import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -58,15 +59,31 @@ export default function SettingsScreen() {
         await refreshProfile();
       }
 
-      Alert.alert('Configuración Guardada', 'Se han actualizado los parámetros por defecto.');
+      if (Platform.OS === 'web') {
+        window.alert('Configuración Guardada: Se han actualizado los parámetros por defecto.');
+      } else {
+        Alert.alert('Configuración Guardada', 'Se han actualizado los parámetros por defecto.');
+      }
     } catch (e: any) {
-      Alert.alert('Error', e.message || 'No se pudieron guardar los ajustes');
+      if (Platform.OS === 'web') {
+        window.alert(e.message || 'No se pudieron guardar los ajustes');
+      } else {
+        Alert.alert('Error', e.message || 'No se pudieron guardar los ajustes');
+      }
     } finally {
       setSaving(false);
     }
   };
 
   const handleSignOut = async () => {
+    if (Platform.OS === 'web') {
+      const confirmSignOut = typeof window !== 'undefined' ? window.confirm('¿Desea cerrar su sesión activa en TripRate?') : true;
+      if (confirmSignOut) {
+        await signOut();
+      }
+      return;
+    }
+
     Alert.alert('Cerrar Sesión', '¿Desea cerrar su sesión activa?', [
       { text: 'Cancelar', style: 'cancel' },
       {
@@ -74,7 +91,6 @@ export default function SettingsScreen() {
         style: 'destructive',
         onPress: async () => {
           await signOut();
-          router.replace('/(auth)/login');
         },
       },
     ]);
@@ -222,9 +238,9 @@ export default function SettingsScreen() {
           activeOpacity={0.8}
         >
           {saving ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={colors.primaryText} />
           ) : (
-            <Text style={styles.saveButtonText}>Guardar Configuración de Cuenta</Text>
+            <Text style={[styles.saveButtonText, { color: colors.primaryText }]}>Guardar Configuración de Cuenta</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -370,7 +386,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   saveButtonText: {
-    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },

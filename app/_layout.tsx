@@ -110,7 +110,11 @@ function MainApp() {
       setSession(null);
       setProfile(null);
       setLoading(false);
-      router.replace('/(auth)/login');
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        window.location.href = window.location.origin + '/(auth)/login';
+      } else {
+        router.replace('/(auth)/login');
+      }
     }
   };
 
