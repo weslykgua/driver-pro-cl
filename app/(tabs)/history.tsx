@@ -40,6 +40,8 @@ export default function HistoryScreen() {
   const [editDateStr, setEditDateStr] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [editGrossStr, setEditGrossStr] = useState('');
+  const [editCashCollectedStr, setEditCashCollectedStr] = useState('');
+  const [editHighwayCostStr, setEditHighwayCostStr] = useState('');
   const [editHoursStr, setEditHoursStr] = useState('');
   const [editKmStr, setEditKmStr] = useState('');
   const [editConsumptionStr, setEditConsumptionStr] = useState('');
@@ -182,6 +184,8 @@ export default function HistoryScreen() {
     setEditingShift(shift);
     setEditDateStr(shift.shift_date);
     setEditGrossStr(shift.gross_earnings.toString());
+    setEditCashCollectedStr((shift.cash_collected || 0).toString());
+    setEditHighwayCostStr((shift.highway_cost || 0).toString());
     setEditHoursStr(shift.hours.toString());
     setEditKmStr(shift.distance_km.toString());
     setEditConsumptionStr(shift.fuel_consumption.toString());
@@ -202,6 +206,8 @@ export default function HistoryScreen() {
     setSavingEdit(true);
     try {
       const gross = parseFloat(editGrossStr) || 0;
+      const cashCollected = parseFloat(editCashCollectedStr) || 0;
+      const highwayCost = parseFloat(editHighwayCostStr) || 0;
       const hours = parseFloat(editHoursStr) || 0;
       const distanceKm = parseFloat(editKmStr) || 0;
       const fuelConsumption = parseFloat(editConsumptionStr) || 7.4;
@@ -210,7 +216,8 @@ export default function HistoryScreen() {
 
       const input: ShiftInput = {
         grossEarnings: gross,
-        cashCollected: 0,
+        cashCollected,
+        highwayCost,
         hours: Math.floor(hours),
         minutes: Math.round((hours - Math.floor(hours)) * 60),
         distanceKm,
@@ -224,7 +231,8 @@ export default function HistoryScreen() {
       const updatedShiftData = {
         shift_date: newShiftDate,
         gross_earnings: gross,
-        cash_collected: 0,
+        cash_collected: cashCollected,
+        highway_cost: highwayCost,
         hours: metrics.totalHours,
         distance_km: distanceKm,
         fuel_consumption: fuelConsumption,
@@ -285,12 +293,14 @@ export default function HistoryScreen() {
     const headers = [
       'Fecha',
       'Bruto CLP',
+      'Efectivo Recibido CLP',
       'Horas Conectado',
       'Km Recorridos',
       'Consumo L/100km',
       'Retención SII CLP',
       'Saldo App CLP',
       'Bencina Gastada CLP',
+      'Gasto TAG CLP',
       'Bolsillo Neto CLP',
       'CLP por Hora',
       'CLP por Km',
@@ -310,12 +320,14 @@ export default function HistoryScreen() {
         return `<tr>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;">${s.shift_date}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.gross_earnings}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.cash_collected || 0}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.hours}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.distance_km}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.fuel_consumption}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.sii_tax_amount}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.app_balance}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.fuel_cost}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.highway_cost || 0}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;font-weight:bold;">${s.pocket_net}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.pocket_net_per_hour}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.pocket_net_per_km}</td>
@@ -498,6 +510,11 @@ export default function HistoryScreen() {
                     </View>
 
                     <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Efectivo Recibido en Jornada:</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{formatCLP(item.cash_collected || 0)}</Text>
+                    </View>
+
+                    <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Saldo Plataforma Transferible:</Text>
                       <Text style={[styles.detailValue, { color: colors.secondary }]}>
                         {formatCLP(item.app_balance)}
@@ -525,6 +542,13 @@ export default function HistoryScreen() {
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Gasto Combustible ({item.fuel_liters} L):</Text>
                       <Text style={[styles.detailValue, { color: colors.danger }]}>
                         -{formatCLP(item.fuel_cost)}
+                      </Text>
+                    </View>
+
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Gasto Autopista / TAG:</Text>
+                      <Text style={[styles.detailValue, { color: colors.danger }]}>
+                        -{formatCLP(item.highway_cost || 0)}
                       </Text>
                     </View>
 
@@ -635,6 +659,30 @@ export default function HistoryScreen() {
                   value={editGrossStr}
                   onChangeText={setEditGrossStr}
                   keyboardType="numeric"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Efectivo Recibido ($ CLP)</Text>
+                <TextInput
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
+                  value={editCashCollectedStr}
+                  onChangeText={setEditCashCollectedStr}
+                  keyboardType="numeric"
+                  placeholder="Ej: 15000"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Gasto Autopista / TAG ($ CLP)</Text>
+                <TextInput
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
+                  value={editHighwayCostStr}
+                  onChangeText={setEditHighwayCostStr}
+                  keyboardType="numeric"
+                  placeholder="Ej: 4500"
                   placeholderTextColor={colors.textMuted}
                 />
               </View>

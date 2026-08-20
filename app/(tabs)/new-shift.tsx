@@ -33,6 +33,8 @@ export default function NewShiftScreen() {
 
   // Clean empty defaults
   const [grossEarningsStr, setGrossEarningsStr] = useState('');
+  const [cashCollectedStr, setCashCollectedStr] = useState('');
+  const [highwayCostStr, setHighwayCostStr] = useState('');
   const [hoursStr, setHoursStr] = useState('');
   const [minutesStr, setMinutesStr] = useState('');
   const [distanceKmStr, setDistanceKmStr] = useState('');
@@ -58,7 +60,8 @@ export default function NewShiftScreen() {
   const shiftInput: ShiftInput = useMemo(() => {
     return {
       grossEarnings: parseFloat(grossEarningsStr) || 0,
-      cashCollected: 0,
+      cashCollected: parseFloat(cashCollectedStr) || 0,
+      highwayCost: parseFloat(highwayCostStr) || 0,
       hours: parseFloat(hoursStr) || 0,
       minutes: parseFloat(minutesStr) || 0,
       distanceKm: parseFloat(distanceKmStr) || 0,
@@ -68,6 +71,8 @@ export default function NewShiftScreen() {
     };
   }, [
     grossEarningsStr,
+    cashCollectedStr,
+    highwayCostStr,
     hoursStr,
     minutesStr,
     distanceKmStr,
@@ -85,7 +90,8 @@ export default function NewShiftScreen() {
         user_id: user?.id || 'demo-user-id',
         shift_date: shiftDate,
         gross_earnings: shiftInput.grossEarnings,
-        cash_collected: 0,
+        cash_collected: shiftInput.cashCollected,
+        highway_cost: shiftInput.highwayCost,
         hours: liveMetrics.totalHours,
         distance_km: shiftInput.distanceKm,
         fuel_consumption: shiftInput.fuelConsumption,
@@ -231,6 +237,39 @@ export default function NewShiftScreen() {
                 placeholder="Ej: 75000"
                 placeholderTextColor={colors.textMuted}
               />
+            </View>
+          </View>
+
+          {/* Cash Collected & Highway/TAG Expenses */}
+          <View style={styles.rowTwoInputs}>
+            <View style={[styles.inputGroup, { flex: 1 }]}>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Efectivo Recibido ($)</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+                <Text style={[styles.currencySymbol, { color: colors.primary }]}>$</Text>
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  value={cashCollectedStr}
+                  onChangeText={setCashCollectedStr}
+                  keyboardType="numeric"
+                  placeholder="Ej: 15000"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
+            </View>
+
+            <View style={[styles.inputGroup, { flex: 1 }]}>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Gasto Autopista/TAG ($)</Text>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark }]}>
+                <Text style={[styles.currencySymbol, { color: colors.primary }]}>$</Text>
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  value={highwayCostStr}
+                  onChangeText={setHighwayCostStr}
+                  keyboardType="numeric"
+                  placeholder="Ej: 4500"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
             </View>
           </View>
 

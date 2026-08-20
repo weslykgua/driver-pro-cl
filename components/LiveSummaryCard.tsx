@@ -25,7 +25,7 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
         >
           {formatCLP(metrics.pocketNet)}
         </Text>
-        <Text style={[styles.heroSubtext, { color: colors.textMuted }]}>Monto disponible tras retención legal SII y gasto estimado de combustible</Text>
+        <Text style={[styles.heroSubtext, { color: colors.textMuted }]}>Monto disponible tras retención legal SII, combustible y peajes/TAG</Text>
       </View>
 
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -42,6 +42,11 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
         <View style={styles.gridRow}>
           <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>Combustible Estimado ({metrics.fuelLiters} L)</Text>
           <Text style={[styles.rowValue, { color: colors.danger }]}>-{formatCLP(metrics.fuelCost)}</Text>
+        </View>
+
+        <View style={styles.gridRow}>
+          <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>Gasto Autopista / TAG</Text>
+          <Text style={[styles.rowValue, { color: colors.danger }]}>-{formatCLP(metrics.highwayCost)}</Text>
         </View>
 
         <View style={styles.gridRow}>

@@ -94,64 +94,7 @@ EXPO_PUBLIC_SUPABASE_URL=https://yryytrrrbftppigixtkc.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-### 2. Esquema SQL para Supabase
-
-Ejecuta el siguiente script en el **SQL Editor** de Supabase para crear las tablas con reglas de seguridad **RLS**:
-
-```sql
--- 1. Tabla de Perfiles de Usuario
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT NOT NULL,
-  sii_tax_rate NUMERIC DEFAULT 0.1525,
-  default_gas_price NUMERIC DEFAULT 1450,
-  monthly_pocket_target NUMERIC DEFAULT 1300000,
-  default_consumption NUMERIC DEFAULT 7.4,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- 2. Tabla de Turnos Diarios
-CREATE TABLE IF NOT EXISTS public.daily_shifts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  shift_date DATE NOT NULL,
-  gross_earnings NUMERIC NOT NULL DEFAULT 0,
-  cash_collected NUMERIC NOT NULL DEFAULT 0,
-  hours NUMERIC NOT NULL DEFAULT 0,
-  distance_km NUMERIC NOT NULL DEFAULT 0,
-  fuel_consumption NUMERIC NOT NULL DEFAULT 7.4,
-  gas_price_per_liter NUMERIC NOT NULL DEFAULT 1450,
-  sii_tax_rate NUMERIC NOT NULL DEFAULT 0.1525,
-  sii_tax_amount NUMERIC NOT NULL DEFAULT 0,
-  app_balance NUMERIC NOT NULL DEFAULT 0,
-  app_liquid NUMERIC NOT NULL DEFAULT 0,
-  fuel_liters NUMERIC NOT NULL DEFAULT 0,
-  fuel_cost NUMERIC NOT NULL DEFAULT 0,
-  pocket_net NUMERIC NOT NULL DEFAULT 0,
-  pocket_net_per_hour NUMERIC NOT NULL DEFAULT 0,
-  pocket_net_per_km NUMERIC NOT NULL DEFAULT 0,
-  avg_speed_kmh NUMERIC NOT NULL DEFAULT 0,
-  notes TEXT,
-  is_deleted BOOLEAN DEFAULT false,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- Habilitar Row Level Security (RLS)
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.daily_shifts ENABLE ROW LEVEL SECURITY;
-
--- Políticas de Seguridad para Profiles
-CREATE POLICY "Usuarios administran su propio perfil" 
-  ON public.profiles FOR ALL 
-  USING (auth.uid() = id);
-
--- Políticas de Seguridad para Daily Shifts
-CREATE POLICY "Usuarios administran sus propios turnos" 
-  ON public.daily_shifts FOR ALL 
-  USING (auth.uid() = user_id);
-```
-
-### 3. Comandos de Desarrollo
+### 2. Comandos de Desarrollo
 
 ```bash
 # Instalar dependencias

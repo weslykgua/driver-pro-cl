@@ -132,6 +132,8 @@ export default function DashboardScreen() {
 
   const totalPocketNet = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.pocket_net), 0);
   const totalFuelCost = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.fuel_cost), 0);
+  const totalHighwayCost = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.highway_cost || 0), 0);
+  const totalCashCollected = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.cash_collected || 0), 0);
   const totalSiiTax = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.sii_tax_amount), 0);
   const totalAppBalance = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.app_balance), 0);
   const totalHours = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.hours), 0);
@@ -311,6 +313,25 @@ export default function DashboardScreen() {
             style={styles.halfCard}
           />
           <MetricCard
+            title="Gasto Total TAG / Peajes"
+            value={formatCLP(totalHighwayCost)}
+            subtitle="Autopistas acumuladas"
+            iconName="car-outline"
+            variant="amber"
+            style={styles.halfCard}
+          />
+        </View>
+
+        <View style={styles.twoColumnRow}>
+          <MetricCard
+            title="Saldo App Transferible"
+            value={formatCLP(totalAppBalance)}
+            subtitle={totalCashCollected > 0 ? `Efectivo: ${formatCLP(totalCashCollected)}` : "Saldo en plataforma"}
+            iconName="card-outline"
+            variant="blue"
+            style={styles.halfCard}
+          />
+          <MetricCard
             title="Retención SII Total"
             value={formatCLP(totalSiiTax)}
             subtitle="Tasa legal 15.25%"
@@ -322,14 +343,6 @@ export default function DashboardScreen() {
 
         <View style={styles.twoColumnRow}>
           <MetricCard
-            title="Saldo App Transferible"
-            value={formatCLP(totalAppBalance)}
-            subtitle="Saldo en plataforma"
-            iconName="card-outline"
-            variant="blue"
-            style={styles.halfCard}
-          />
-          <MetricCard
             title="Promedio / Hora"
             value={`${formatCLP(avgNetPerHour)}/h`}
             subtitle={`${totalHours.toFixed(1)} hrs conectadas`}
@@ -337,16 +350,13 @@ export default function DashboardScreen() {
             variant="emerald"
             style={styles.halfCard}
           />
-        </View>
-
-        <View style={styles.twoColumnRow}>
           <MetricCard
             title="Promedio / Km"
             value={`${formatCLP(avgNetPerKm)}/km`}
             subtitle={`${totalKm} km recorridos`}
             iconName="navigate-outline"
             variant="blue"
-            style={styles.fullWidthCard}
+            style={styles.halfCard}
           />
         </View>
       </View>
