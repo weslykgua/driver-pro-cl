@@ -134,6 +134,7 @@ export default function DashboardScreen() {
   const totalFuelCost = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.fuel_cost), 0);
   const totalHighwayCost = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.highway_cost || 0), 0);
   const totalCashCollected = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.cash_collected || 0), 0);
+  const totalPrivateEarnings = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.private_earnings || 0), 0);
   const totalSiiTax = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.sii_tax_amount), 0);
   const totalAppBalance = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.app_balance), 0);
   const totalHours = filteredShifts.reduce((sum: number, s: DailyShift) => sum + Number(s.hours), 0);
@@ -297,7 +298,7 @@ export default function DashboardScreen() {
         <MetricCard
           title="Bolsillo Libre Acumulado"
           value={formatCLP(totalPocketNet)}
-          subtitle={`${filteredShifts.length} turnos registrados`}
+          subtitle={totalPrivateEarnings > 0 ? `${filteredShifts.length} turnos • Fuera de app: ${formatCLP(totalPrivateEarnings)}` : `${filteredShifts.length} turnos registrados`}
           iconName="wallet-outline"
           variant="emerald"
           style={styles.fullWidthCard}

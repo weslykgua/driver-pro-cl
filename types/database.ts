@@ -15,6 +15,7 @@ export interface DailyShift {
   gross_earnings: number;
   cash_collected: number;
   highway_cost?: number;
+  private_earnings?: number;
   hours: number;
   distance_km: number;
   fuel_consumption: number;
@@ -38,6 +39,7 @@ export interface ShiftInput {
   grossEarnings: number;
   cashCollected: number;
   highwayCost?: number;
+  privateEarnings?: number;
   hours: number;
   minutes: number;
   distanceKm: number;
@@ -54,6 +56,7 @@ export interface CalculatedMetrics {
   fuelLiters: number;
   fuelCost: number;
   highwayCost: number;
+  privateEarnings: number;
   pocketNet: number;
   pocketNetPerHour: number;
   pocketNetPerKm: number;

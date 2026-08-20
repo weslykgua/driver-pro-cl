@@ -49,6 +49,13 @@ export const LiveSummaryCard: React.FC<LiveSummaryCardProps> = ({ metrics, siiTa
           <Text style={[styles.rowValue, { color: colors.danger }]}>-{formatCLP(metrics.highwayCost)}</Text>
         </View>
 
+        {metrics.privateEarnings > 0 && (
+          <View style={styles.gridRow}>
+            <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>Carreras Fuera de Uber</Text>
+            <Text style={[styles.rowValue, { color: colors.success }]}>+{formatCLP(metrics.privateEarnings)}</Text>
+          </View>
+        )}
+
         <View style={styles.gridRow}>
           <Text style={[styles.rowLabel, { color: colors.textSecondary }]}>Retención Legal SII ({siiTaxRatePercentage.toFixed(2)}%)</Text>
           <Text style={[styles.rowValue, { color: colors.warning }]}>-{formatCLP(metrics.siiTaxAmount)}</Text>

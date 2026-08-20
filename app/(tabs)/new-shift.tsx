@@ -35,6 +35,8 @@ export default function NewShiftScreen() {
   const [grossEarningsStr, setGrossEarningsStr] = useState('');
   const [cashCollectedStr, setCashCollectedStr] = useState('');
   const [highwayCostStr, setHighwayCostStr] = useState('');
+  const [privateEarningsStr, setPrivateEarningsStr] = useState('');
+  const [showPrivateSection, setShowPrivateSection] = useState(false);
   const [hoursStr, setHoursStr] = useState('');
   const [minutesStr, setMinutesStr] = useState('');
   const [distanceKmStr, setDistanceKmStr] = useState('');
@@ -62,6 +64,7 @@ export default function NewShiftScreen() {
       grossEarnings: parseFloat(grossEarningsStr) || 0,
       cashCollected: parseFloat(cashCollectedStr) || 0,
       highwayCost: parseFloat(highwayCostStr) || 0,
+      privateEarnings: parseFloat(privateEarningsStr) || 0,
       hours: parseFloat(hoursStr) || 0,
       minutes: parseFloat(minutesStr) || 0,
       distanceKm: parseFloat(distanceKmStr) || 0,
@@ -73,6 +76,7 @@ export default function NewShiftScreen() {
     grossEarningsStr,
     cashCollectedStr,
     highwayCostStr,
+    privateEarningsStr,
     hoursStr,
     minutesStr,
     distanceKmStr,
@@ -92,6 +96,7 @@ export default function NewShiftScreen() {
         gross_earnings: shiftInput.grossEarnings,
         cash_collected: shiftInput.cashCollected,
         highway_cost: shiftInput.highwayCost,
+        private_earnings: shiftInput.privateEarnings,
         hours: liveMetrics.totalHours,
         distance_km: shiftInput.distanceKm,
         fuel_consumption: shiftInput.fuelConsumption,
@@ -272,6 +277,46 @@ export default function NewShiftScreen() {
               </View>
             </View>
           </View>
+
+          {/* Optional Button / Card for Private / Off-App Rides */}
+          {!showPrivateSection ? (
+            <TouchableOpacity
+              style={[styles.addPrivateButton, { backgroundColor: colors.neutralSoft, borderColor: colors.borderDark }]}
+              onPress={() => setShowPrivateSection(true)}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="car-sport-outline" size={16} color={colors.primary} />
+              <Text style={[styles.addPrivateButtonText, { color: colors.primary }]}>
+                + Agregar Carrera Fuera de Uber / Particular
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={[styles.privateSectionCard, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
+              <View style={styles.privateHeaderRow}>
+                <Text style={[styles.label, { color: colors.success, marginBottom: 0 }]}>
+                  Carreras Fuera de Uber / Particulares
+                </Text>
+                <TouchableOpacity onPress={() => { setPrivateEarningsStr(''); setShowPrivateSection(false); }}>
+                  <Ionicons name="close-circle-outline" size={18} color={colors.textMuted} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.borderDark, marginTop: 8 }]}>
+                <Text style={[styles.currencySymbol, { color: colors.success }]}>$</Text>
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  value={privateEarningsStr}
+                  onChangeText={setPrivateEarningsStr}
+                  keyboardType="numeric"
+                  placeholder="Ej: 25000"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
+              <Text style={[styles.privateHelpText, { color: colors.textMuted }]}>
+                Ingresos directos particulares sin comisión de app ni retención SII.
+              </Text>
+            </View>
+          )}
 
           {/* Connected Time */}
           <Text style={[styles.label, { color: colors.textSecondary }]}>Tiempo Conectado Total</Text>
@@ -498,5 +543,36 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+  addPrivateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 14,
+  },
+  addPrivateButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  privateSectionCard: {
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    padding: 12,
+    marginBottom: 14,
+  },
+  privateHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  privateHelpText: {
+    fontSize: 10,
+    marginTop: 6,
   },
 });

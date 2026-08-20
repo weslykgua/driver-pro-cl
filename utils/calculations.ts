@@ -10,8 +10,9 @@ export function calculateDailyMetrics(input: ShiftInput): CalculatedMetrics {
   const fuelLiters = (input.fuelConsumption / 100) * input.distanceKm;
   const fuelCost = Math.round(fuelLiters * input.gasPricePerLiter);
   const highwayCost = Math.round(input.highwayCost || 0);
+  const privateEarnings = Math.round(input.privateEarnings || 0);
 
-  const pocketNet = appLiquid - fuelCost - highwayCost; // Dinero real libre en bolsillo
+  const pocketNet = appLiquid + privateEarnings - fuelCost - highwayCost; // Dinero real libre en bolsillo
   const pocketNetPerHour = totalHours > 0 ? Math.round(pocketNet / totalHours) : 0;
   const pocketNetPerKm = input.distanceKm > 0 ? Math.round(pocketNet / input.distanceKm) : 0;
   const avgSpeedKmh = totalHours > 0 ? Number((input.distanceKm / totalHours).toFixed(1)) : 0;
@@ -24,6 +25,7 @@ export function calculateDailyMetrics(input: ShiftInput): CalculatedMetrics {
     fuelLiters: Number(fuelLiters.toFixed(2)),
     fuelCost,
     highwayCost,
+    privateEarnings,
     pocketNet,
     pocketNetPerHour,
     pocketNetPerKm,

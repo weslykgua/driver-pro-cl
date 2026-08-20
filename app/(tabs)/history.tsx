@@ -42,6 +42,7 @@ export default function HistoryScreen() {
   const [editGrossStr, setEditGrossStr] = useState('');
   const [editCashCollectedStr, setEditCashCollectedStr] = useState('');
   const [editHighwayCostStr, setEditHighwayCostStr] = useState('');
+  const [editPrivateEarningsStr, setEditPrivateEarningsStr] = useState('');
   const [editHoursStr, setEditHoursStr] = useState('');
   const [editKmStr, setEditKmStr] = useState('');
   const [editConsumptionStr, setEditConsumptionStr] = useState('');
@@ -186,6 +187,7 @@ export default function HistoryScreen() {
     setEditGrossStr(shift.gross_earnings.toString());
     setEditCashCollectedStr((shift.cash_collected || 0).toString());
     setEditHighwayCostStr((shift.highway_cost || 0).toString());
+    setEditPrivateEarningsStr((shift.private_earnings || 0).toString());
     setEditHoursStr(shift.hours.toString());
     setEditKmStr(shift.distance_km.toString());
     setEditConsumptionStr(shift.fuel_consumption.toString());
@@ -208,6 +210,7 @@ export default function HistoryScreen() {
       const gross = parseFloat(editGrossStr) || 0;
       const cashCollected = parseFloat(editCashCollectedStr) || 0;
       const highwayCost = parseFloat(editHighwayCostStr) || 0;
+      const privateEarnings = parseFloat(editPrivateEarningsStr) || 0;
       const hours = parseFloat(editHoursStr) || 0;
       const distanceKm = parseFloat(editKmStr) || 0;
       const fuelConsumption = parseFloat(editConsumptionStr) || 7.4;
@@ -218,6 +221,7 @@ export default function HistoryScreen() {
         grossEarnings: gross,
         cashCollected,
         highwayCost,
+        privateEarnings,
         hours: Math.floor(hours),
         minutes: Math.round((hours - Math.floor(hours)) * 60),
         distanceKm,
@@ -233,6 +237,7 @@ export default function HistoryScreen() {
         gross_earnings: gross,
         cash_collected: cashCollected,
         highway_cost: highwayCost,
+        private_earnings: privateEarnings,
         hours: metrics.totalHours,
         distance_km: distanceKm,
         fuel_consumption: fuelConsumption,
@@ -294,6 +299,7 @@ export default function HistoryScreen() {
       'Fecha',
       'Bruto CLP',
       'Efectivo Recibido CLP',
+      'Carreras Fuera de Uber CLP',
       'Horas Conectado',
       'Km Recorridos',
       'Consumo L/100km',
@@ -321,6 +327,7 @@ export default function HistoryScreen() {
           <td style="border:1px solid #CBD5E1;padding:6px 10px;">${s.shift_date}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.gross_earnings}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.cash_collected || 0}</td>
+          <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.private_earnings || 0}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.hours}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.distance_km}</td>
           <td style="border:1px solid #CBD5E1;padding:6px 10px;text-align:right;">${s.fuel_consumption}</td>
@@ -552,6 +559,15 @@ export default function HistoryScreen() {
                       </Text>
                     </View>
 
+                    {item.private_earnings ? (
+                      <View style={styles.detailRow}>
+                        <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Carreras Fuera de Uber:</Text>
+                        <Text style={[styles.detailValue, { color: colors.success }]}>
+                          +{formatCLP(item.private_earnings)}
+                        </Text>
+                      </View>
+                    ) : null}
+
                     <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>Tiempo Conectado:</Text>
                       <Text style={[styles.detailValue, { color: colors.text }]}>{formatHoursDecimal(item.hours)}</Text>
@@ -683,6 +699,18 @@ export default function HistoryScreen() {
                   onChangeText={setEditHighwayCostStr}
                   keyboardType="numeric"
                   placeholder="Ej: 4500"
+                  placeholderTextColor={colors.textMuted}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Carreras Fuera de Uber / Particulares ($ CLP)</Text>
+                <TextInput
+                  style={[styles.modalInput, { backgroundColor: colors.surface, borderColor: colors.borderDark, color: colors.text }]}
+                  value={editPrivateEarningsStr}
+                  onChangeText={setEditPrivateEarningsStr}
+                  keyboardType="numeric"
+                  placeholder="Ej: 25000"
                   placeholderTextColor={colors.textMuted}
                 />
               </View>
