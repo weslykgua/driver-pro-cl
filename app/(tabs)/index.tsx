@@ -162,7 +162,7 @@ export default function DashboardScreen() {
       {/* Brand Header */}
       <View style={styles.headerRow}>
         <View style={styles.headerTitleContainer}>
-          <Text style={[styles.brandTitle, { color: colors.text }]}>TripRate</Text>
+          <Text style={[styles.brandTitle, { color: colors.text }]}>Drivera</Text>
           <Text style={[styles.brandSubtext, { color: colors.textSecondary }]} numberOfLines={1}>
             Control financiero para conductores
           </Text>

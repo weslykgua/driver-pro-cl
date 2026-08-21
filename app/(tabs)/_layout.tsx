@@ -26,7 +26,7 @@ export default function TabsLayout() {
               <Ionicons name="bar-chart-outline" size={18} color={colors.primary} />
             </View>
             <View style={styles.brandTitleContainer}>
-              <Text style={[styles.desktopBrandName, { color: colors.primary }]}>TripRate</Text>
+              <Text style={[styles.desktopBrandName, { color: colors.primary }]}>Drivera</Text>
               <Text style={[styles.desktopBrandSubtitle, { color: colors.textMuted }]} numberOfLines={1}>
                 Gestión Financiera & Control Operativo
               </Text>

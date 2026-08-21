@@ -1,12 +1,12 @@
-# 📊 TripRate — Plataforma de Gestión Financiera para Conductores
+# 📊 Drivera — Plataforma de Gestión Financiera para Conductores
 
-**TripRate** es una plataforma financiera profesional diseñada específicamente para conductores de aplicaciones de transporte (Uber, DiDi, Cabify) en Chile. 
+**Drivera** es una plataforma financiera profesional diseñada específicamente para conductores de aplicaciones de transporte (Uber, DiDi, Cabify) en Chile. 
 
 Permite calcular de forma automática e instantánea el **ingreso neto real en bolsillo**, descontando con precisión la **retención legal del SII (15.25%)**, el gasto estimado de **combustible por kilómetro** y las métricas de rendimiento por hora trabajada.
 
 ---
 
-## 🎯 ¿Qué problema resuelve TripRate? (Explicación para no programadores)
+## 🎯 ¿Qué problema resuelve Drivera? (Explicación para no programadores)
 
 Cuando trabajas en aplicaciones de transporte, el monto que ves en la pantalla de la app (Ganancia Bruta) **no es el dinero real que entra a tu bolsillo**.
 
@@ -14,7 +14,7 @@ Para saber cuánto ganaste verdaderamente, debes restar:
 1. **La retención legal del SII (15.25%):** El impuesto retenido legalmente sobre tus ingresos brutos.
 2. **El consumo real de bencina:** Calculado según el kilometraje recorrido por jornada y el rendimiento de tu vehículo (`L/100km`).
 
-**TripRate hace todos estos cálculos matemáticos de forma automática por ti en segundos**, entregándote cifras exactas de:
+**Drivera hace todos estos cálculos matemáticos de forma automática por ti en segundos**, entregándote cifras exactas de:
 - **Dinero líquido libre en tu bolsillo.**
 - **Tu ganancia real por hora trabajada (`$/hora`).**
 - **Tu ganancia por kilómetro recorrido (`$/km`).**
@@ -65,7 +65,7 @@ La aplicación calcula automáticamente:
 
 ## 🛠️ Tecnologías Utilizadas
 
-La arquitectura de TripRate está construida con tecnología de estándar empresarial para garantizar rapidez, seguridad y funcionamiento fluido tanto en computadores como en teléfonos móviles:
+La arquitectura de Drivera está construida con tecnología de estándar empresarial para garantizar rapidez, seguridad y funcionamiento fluido tanto en computadores como en teléfonos móviles:
 
 ### Frontend / Aplicación
 - **[React Native](https://reactnative.dev/) & [Expo Router v3](https://docs.expo.dev/router/introduction/):** Framework universal para desarrollo multiplataforma (Web, Android, iOS).
@@ -114,4 +114,4 @@ npm run build:web
 
 ## 📜 Licencia y Derechos
 
-© 2026 **TripRate** — Todos los derechos reservados. Plataforma de control financiero y gestión operativa para conductores.
+© 2026 **Drivera** — Todos los derechos reservados. Plataforma de control financiero y gestión operativa para conductores.

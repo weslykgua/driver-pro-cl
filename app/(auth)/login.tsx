@@ -101,7 +101,7 @@ export default function LoginScreen() {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
-      const redirectUrl = Platform.OS === 'web' ? window.location.origin : 'triprate://';
+      const redirectUrl = Platform.OS === 'web' ? window.location.origin : 'drivera://';
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -138,7 +138,7 @@ export default function LoginScreen() {
             <View style={[styles.logoBadge, { backgroundColor: colors.neutralSoft, borderColor: colors.border }]}>
               <Ionicons name="bar-chart" size={28} color={colors.primary} />
             </View>
-            <Text style={[styles.appName, { color: colors.text }]}>TripRate</Text>
+            <Text style={[styles.appName, { color: colors.text }]}>Drivera</Text>
             <Text style={[styles.appTagline, { color: colors.textSecondary }]}>Control financiero para conductores</Text>
           </View>
 

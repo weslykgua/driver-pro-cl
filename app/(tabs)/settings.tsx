@@ -77,7 +77,7 @@ export default function SettingsScreen() {
 
   const handleSignOut = async () => {
     if (Platform.OS === 'web') {
-      const confirmSignOut = typeof window !== 'undefined' ? window.confirm('¿Desea cerrar su sesión activa en TripRate?') : true;
+      const confirmSignOut = typeof window !== 'undefined' ? window.confirm('¿Desea cerrar su sesión activa en Drivera?') : true;
       if (confirmSignOut) {
         await signOut();
       }

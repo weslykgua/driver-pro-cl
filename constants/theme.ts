@@ -120,7 +120,7 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const THEME_STORAGE_KEY = 'triprate_theme_mode_v2';
+const THEME_STORAGE_KEY = 'drivera_theme_mode_v2';
 
 const ThemeContext = createContext<ThemeContextType>({
   themeMode: 'dark',
