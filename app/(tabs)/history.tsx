@@ -1048,8 +1048,11 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm,
     borderWidth: 1,
     paddingHorizontal: 12,
-    height: 42,
+    minHeight: 44,
+    height: 44,
     fontSize: 14,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   modalActions: {
     flexDirection: 'row',
