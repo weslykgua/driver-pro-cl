@@ -123,7 +123,7 @@ export default function LoginScreen() {
       }
 
       // Native Mobile (Android / iOS)
-      const redirectUrl = Linking.createURL('/');
+      const redirectUrl = 'drivera://';
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
