@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import { Profile } from '../types/database';
 import { ThemeProvider, useTheme, LIGHT_FINTECH_COLORS } from '../constants/theme';
 import { CookieConsentBanner } from '../components/CookieConsentBanner';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 interface AuthContextType {
   session: Session | null;
@@ -168,7 +169,11 @@ function MainApp() {
             `
           }} />
         )}
-        <StatusBar style={colors.isDark ? "light" : "dark"} />
+        <StatusBar
+          style={colors.isDark ? "light" : "dark"}
+          translucent
+          backgroundColor="transparent"
+        />
         <Stack
           screenOptions={{
             headerShown: false,
@@ -189,9 +194,11 @@ function MainApp() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <MainApp />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <MainApp />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 

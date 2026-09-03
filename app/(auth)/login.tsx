@@ -11,7 +11,9 @@ import {
   Platform,
   ScrollView,
   useWindowDimensions,
+  StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
@@ -23,6 +25,7 @@ import { handleAuthUrl } from '../../utils/authUrlHandler';
 WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { colors } = useTheme();
@@ -160,11 +163,13 @@ export default function LoginScreen() {
     }
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    const topInset = isDesktop ? 0 : Platform.OS === 'android' ? Math.max(StatusBar.currentHeight || 0, insets.top, 28) : insets.top;
+
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={[styles.container, { backgroundColor: colors.background, paddingTop: topInset }]}
+      >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={[
           styles.cardContainer,

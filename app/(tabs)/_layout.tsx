@@ -1,18 +1,16 @@
-import React from 'react';
 import { Tabs } from 'expo-router';
-import { View, Text, StyleSheet, Platform, useWindowDimensions, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme, RADIUS } from '../../constants/theme';
+import { View, Text, StyleSheet, Platform, useWindowDimensions, TouchableOpacity, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const { colors, toggleTheme, themeMode } = useTheme();
 
   const isDesktop = Platform.OS === 'web' && width >= 768;
   const is4k = Platform.OS === 'web' && width >= 1800;
 
-  return (
-    <View style={[styles.webWrapper, { backgroundColor: colors.background }]}>
+  const topInset = isDesktop ? 12 : Platform.OS === 'android' ? Math.max(StatusBar.currentHeight || 0, insets.top, 30) + 6 : Math.max(insets.top, 14) + 6;
+  const bottomInset = isDesktop ? 8 : Math.max(insets.bottom, Platform.OS === 'ios' ? 24 : 8);
       <View style={[
         styles.webContainer,
         { backgroundColor: colors.background },
@@ -20,10 +18,9 @@ export default function TabsLayout() {
         is4k && styles.container4k
       ]}>
         {/* Header (Desktop or Mobile top bar for theme toggle) */}
-        <View style={[styles.headerBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          <View style={styles.desktopBrand}>
-            <View style={[styles.desktopLogoBadge, { backgroundColor: colors.neutralSoft, borderColor: colors.border }]}>
-              <Ionicons name="bar-chart-outline" size={18} color={colors.primary} />
+        <View style={[
+          styles.headerBar,
+          {
             </View>
             <View style={styles.brandTitleContainer}>
               <Text style={[styles.desktopBrandName, { color: colors.primary }]}>Drivera</Text>
@@ -61,15 +58,12 @@ export default function TabsLayout() {
                 backgroundColor: colors.surface,
                 borderTopColor: colors.border,
                 borderTopWidth: 1,
-                height: isDesktop ? 60 : Platform.OS === 'ios' ? 84 : 60,
-                paddingBottom: isDesktop ? 8 : Platform.OS === 'ios' ? 24 : 8,
-                paddingTop: 8,
+                height: isDesktop ? 60 : 54 + bottomInset,
+                paddingBottom: bottomInset,
+                paddingTop: 6,
               },
               tabBarLabelStyle: {
                 fontSize: isDesktop ? 12 : 11,
-                fontWeight: '600',
-              },
-            }}
           >
             <Tabs.Screen
               name="index"
