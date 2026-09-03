@@ -14,8 +14,12 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import { supabase } from '../../lib/supabase';
 import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -101,22 +105,78 @@ export default function LoginScreen() {
   const handleGoogleAuth = async () => {
     try {
       setLoading(true);
-      const redirectUrl = Platform.OS === 'web' ? window.location.origin : 'drivera://';
-      const { error } = await supabase.auth.signInWithOAuth({
+
+      if (Platform.OS === 'web') {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent',
+            },
+          },
+        });
+        if (error) throw error;
+        return;
+      }
+
+      // Native Mobile (Android / iOS)
+      const redirectUrl = Linking.createURL('/');
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
           },
         },
       });
+
       if (error) throw error;
+
+      if (data?.url) {
+        const authResponse = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+
+        if (authResponse.type === 'success' && authResponse.url) {
+          const parsed = Linking.parse(authResponse.url);
+          const params = parsed.queryParams || {};
+
+          if (params.code) {
+            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(params.code as string);
+            if (exchangeError) throw exchangeError;
+          } else {
+            let accessToken = params.access_token as string;
+            let refreshToken = params.refresh_token as string;
+
+            if (!accessToken && authResponse.url.includes('#')) {
+              const hashPart = authResponse.url.split('#')[1];
+              const hashParams = new URLSearchParams(hashPart);
+              accessToken = hashParams.get('access_token') || '';
+              refreshToken = hashParams.get('refresh_token') || '';
+            }
+
+            if (accessToken) {
+              const { error: sessionError } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken || '',
+              });
+              if (sessionError) throw sessionError;
+            }
+          }
+
+          router.replace('/(tabs)');
+        }
+      }
     } catch (error: any) {
       const msg = error.message || 'No se pudo iniciar sesión con Google.';
-      if (Platform.OS === 'web') window.alert(msg);
-      else Alert.alert('Google OAuth', msg);
+      if (Platform.OS === 'web') {
+        window.alert(msg);
+      } else {
+        Alert.alert('Google OAuth', msg);
+      }
     } finally {
       setLoading(false);
     }
