@@ -18,6 +18,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
 import { supabase } from '../../lib/supabase';
 import { useTheme, RADIUS, SHADOWS } from '../../constants/theme';
+import { handleAuthUrl } from '../../utils/authUrlHandler';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -141,33 +142,10 @@ export default function LoginScreen() {
         const authResponse = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
 
         if (authResponse.type === 'success' && authResponse.url) {
-          const parsed = Linking.parse(authResponse.url);
-          const params = parsed.queryParams || {};
-
-          if (params.code) {
-            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(params.code as string);
-            if (exchangeError) throw exchangeError;
-          } else {
-            let accessToken = params.access_token as string;
-            let refreshToken = params.refresh_token as string;
-
-            if (!accessToken && authResponse.url.includes('#')) {
-              const hashPart = authResponse.url.split('#')[1];
-              const hashParams = new URLSearchParams(hashPart);
-              accessToken = hashParams.get('access_token') || '';
-              refreshToken = hashParams.get('refresh_token') || '';
-            }
-
-            if (accessToken) {
-              const { error: sessionError } = await supabase.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken || '',
-              });
-              if (sessionError) throw sessionError;
-            }
+          const success = await handleAuthUrl(authResponse.url);
+          if (success) {
+            router.replace('/(tabs)');
           }
-
-          router.replace('/(tabs)');
         }
       }
     } catch (error: any) {
